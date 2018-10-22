@@ -21,7 +21,7 @@ public:
 	void AddParticle(int);
 	void RemoveParticle(int);
 	void UpdateParticlePosition();
-	float GetParticlePosition(int);
+	float fieldIndexToCoordinate(int);
 	size_t coordinateToFieldIndex(int);
 };
 
@@ -87,12 +87,13 @@ inline void Field::UpdateParticlePosition()
 	}
 }
 
-// Convert back
-inline float Field::GetParticlePosition(int particleListNumber)
+//	Convert from index to coordinate
+inline float Field::fieldIndexToCoordinate(int particleListNumber)
 {
 	return (particleList[particleListNumber].xCoordinate - ((float)DEFAULT_DIMENSION / 2.0f)) * 0.01f;
 }
 
+//	Convert from coordinate to index
 inline size_t Field::coordinateToFieldIndex(int coordinate)
 {
 	return size_t(coordinate) + (DEFAULT_DIMENSION / 2);
