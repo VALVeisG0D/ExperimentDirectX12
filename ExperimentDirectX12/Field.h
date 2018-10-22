@@ -9,6 +9,7 @@ class Field
 	{
 		int xCoordinate;
 		int xPreviousCoordinate;
+		int xInertia;
 	};
 
 	const size_t DEFAULT_NUMBER_OF_PARTICLES = 3;
@@ -68,9 +69,9 @@ inline void Field::RemoveParticle(int coordinate)
 
 inline void Field::UpdateParticlePosition()
 {
-	// 3 steps: calculate, move, delete
-	// Calculate difference between front and back (the sign (-/+) indicates the direction)
-	// Use result to calculate new coordinate of particle
+	// 3 steps: calculate, delete old position, add new position
+	// Store previous coordinate to use for deleting old particle position
+	// Calculate new position of particle
 	for (size_t i = 0; i < DEFAULT_NUMBER_OF_PARTICLES; ++i)
 	{
 		particleList[i].xPreviousCoordinate = particleList[i].xCoordinate;
