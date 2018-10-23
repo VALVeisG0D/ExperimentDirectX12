@@ -74,17 +74,16 @@ inline void Field::UpdateParticlePosition()
 	// Calculate new position of particle
 	for (size_t i = 0; i < DEFAULT_NUMBER_OF_PARTICLES; ++i)
 	{
-		particleList[i].xPreviousCoordinate = particleList[i].xCoordinate;
-		particleList[i].xCoordinate += field[particleList[i].xCoordinate - 1] - field[particleList[i].xCoordinate + 1];
+		//particleList[i].xPreviousCoordinate = particleList[i].xCoordinate;
+		particleList[i].xInertia += field[particleList[i].xCoordinate - 1] - field[particleList[i].xCoordinate + 1];
 	}
-	//std::cout << particleList[0].xCoordinate << " " << particleList[1].xCoordinate << " " << particleList[2].xCoordinate << std::endl;
 
 	// Apply the new particle coordinate to the field
 	// What if they are at the same position?
 	for (size_t i = 0; i < DEFAULT_NUMBER_OF_PARTICLES; ++i)
 	{
-		RemoveParticle(particleList[i].xPreviousCoordinate);
-		AddParticle(particleList[i].xCoordinate);
+		RemoveParticle(particleList[i].xCoordinate);
+		AddParticle(particleList[i].xCoordinate += particleList[i].xInertia);
 	}
 }
 
