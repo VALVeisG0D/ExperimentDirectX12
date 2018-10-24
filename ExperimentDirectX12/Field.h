@@ -8,7 +8,6 @@ class Field
 	struct Particle
 	{
 		int xCoordinate;
-		int xPreviousCoordinate;
 		int xInertia;
 	};
 
@@ -69,17 +68,12 @@ inline void Field::RemoveParticle(int coordinate)
 
 inline void Field::UpdateParticlePosition()
 {
-	// 3 steps: calculate, delete old position, add new position
-	// Store previous coordinate to use for deleting old particle position
-	// Calculate new position of particle
+	// 3 steps: calculate inertia, delete old position, add new position
 	for (size_t i = 0; i < DEFAULT_NUMBER_OF_PARTICLES; ++i)
-	{
-		//particleList[i].xPreviousCoordinate = particleList[i].xCoordinate;
 		particleList[i].xInertia += field[particleList[i].xCoordinate - 1] - field[particleList[i].xCoordinate + 1];
-	}
 
 	// Apply the new particle coordinate to the field
-	// What if they are at the same position?
+	// What if they are at the same position? Then try not to put particles in the same position
 	for (size_t i = 0; i < DEFAULT_NUMBER_OF_PARTICLES; ++i)
 	{
 		RemoveParticle(particleList[i].xCoordinate);
