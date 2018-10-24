@@ -3,7 +3,7 @@
 class Field
 {
 	int (*field);
-	const size_t DEFAULT_DIMENSION = 512;
+	const size_t DEFAULT_DIMENSION = 256;
 
 	struct Particle
 	{
@@ -34,8 +34,8 @@ Field::Field()
 	// Create barrier along edge of field
 	// Have to be big enough so particle cannot overcome
 	// the barrier
-	field[0] = 4096;
-	field[DEFAULT_DIMENSION - 1] = 4096;
+	field[0] = 1;
+	field[DEFAULT_DIMENSION - 1] = 1;
 
 	
 	// Add particles
