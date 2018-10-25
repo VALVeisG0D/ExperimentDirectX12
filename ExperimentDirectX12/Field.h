@@ -31,12 +31,10 @@ Field::Field()
 	field = new int[DEFAULT_DIMENSION]();
 	particleList = new Particle[DEFAULT_NUMBER_OF_PARTICLES]();
 
-	// Create barrier along edge of field
-	// Have to be big enough so particle cannot overcome
-	// the barrier
+	// Create barrier along edge of field so that particles don't
+	// go out of bound
 	field[0] = 1;
 	field[DEFAULT_DIMENSION - 1] = 1;
-
 	
 	// Add particles
 	AddParticle(particleList[0].xCoordinate = coordinateToFieldIndex(-2));
@@ -72,7 +70,7 @@ inline void Field::UpdateParticlePosition()
 	for (size_t i = 0; i < DEFAULT_NUMBER_OF_PARTICLES; ++i)
 		particleList[i].xInertia += field[particleList[i].xCoordinate - 1] - field[particleList[i].xCoordinate + 1];
 
-	// Apply the new particle coordinate to the field
+	// Move the particle by removing from its old position and placing it at the new one
 	// What if they are at the same position? Then try not to put particles in the same position
 	for (size_t i = 0; i < DEFAULT_NUMBER_OF_PARTICLES; ++i)
 	{
