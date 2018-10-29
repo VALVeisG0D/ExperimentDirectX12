@@ -26,8 +26,7 @@ public:
 	void UpdateParticlePosition();
 	float xFieldIndexToCoordinate(int);
 	float yFieldIndexToCoordinate(int);
-	size_t xCoordinateToFieldIndex(int);
-	size_t yCoordinateToFieldIndex(int);
+	size_t coordinateToFieldIndex(int);
 };
 
 Field::Field()
@@ -48,9 +47,9 @@ Field::Field()
 		field[y][0] = field[y][DEFAULT_DIMENSION - 1] = 1;
 	
 	// Add particles
-	AddParticle(particleList[0].yCoordinate = yCoordinateToFieldIndex(0), particleList[0].xCoordinate = xCoordinateToFieldIndex(-2));
-	AddParticle(particleList[1].yCoordinate = yCoordinateToFieldIndex(0), particleList[1].xCoordinate = xCoordinateToFieldIndex(0));
-	AddParticle(particleList[2].yCoordinate = yCoordinateToFieldIndex(0), particleList[2].xCoordinate = xCoordinateToFieldIndex(2));
+	AddParticle(particleList[0].yCoordinate = coordinateToFieldIndex(0), particleList[0].xCoordinate = coordinateToFieldIndex(-2));
+	AddParticle(particleList[1].yCoordinate = coordinateToFieldIndex(0), particleList[1].xCoordinate = coordinateToFieldIndex(0));
+	AddParticle(particleList[2].yCoordinate = coordinateToFieldIndex(0), particleList[2].xCoordinate = coordinateToFieldIndex(2));
 }
 
 Field::~Field()
@@ -121,14 +120,7 @@ inline float Field::yFieldIndexToCoordinate(int particleListNumber)
 }
 
 //	Convert from coordinate to index
-inline size_t Field::xCoordinateToFieldIndex(int xCoordinate)
+inline size_t Field::coordinateToFieldIndex(int coordinate)
 {
-	return size_t(xCoordinate) + (DEFAULT_DIMENSION / 2);
+	return size_t(coordinate) + (DEFAULT_DIMENSION / 2);
 }
-
-inline size_t Field::yCoordinateToFieldIndex(int yCoordinate)
-{
-	return size_t(yCoordinate) + (DEFAULT_DIMENSION / 2);
-}
-
-
