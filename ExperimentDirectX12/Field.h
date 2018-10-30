@@ -1,6 +1,7 @@
 // Speed of light exists because the computer simulating our reality is not powerful enough to perform computation beyond that limit.
 #pragma once
-#define DEFAULT_DIMENSION 256
+constexpr auto DEFAULT_DIMENSION = 256;
+constexpr auto DEFAULT_NUMBER_OF_PARTICLES = 3;
 
 class Field
 {
@@ -14,7 +15,6 @@ class Field
 		int yInertia;
 	};
 
-	const size_t DEFAULT_NUMBER_OF_PARTICLES = 3;
 	Particle* particleList;
 
 public:
@@ -96,6 +96,8 @@ inline void Field::UpdateParticlePosition()
 	for (size_t i = 0; i < DEFAULT_NUMBER_OF_PARTICLES; ++i)
 	{
 		//inertia calculations becomes more complicated for 2 dimensionals
+		// require 4 lines of calculations
+
 		particleList[i].xInertia += field[particleList[i].xCoordinate - 1] - field[particleList[i].xCoordinate + 1];
 	}
 
