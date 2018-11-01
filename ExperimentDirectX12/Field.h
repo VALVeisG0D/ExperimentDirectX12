@@ -96,10 +96,17 @@ inline void Field::UpdateParticlePosition()
 	for (size_t i = 0; i < DEFAULT_NUMBER_OF_PARTICLES; ++i)
 	{
 		//	Calculating the inertias on the diagonals
-		particleList[i].xInertia += particleList[i].yInertia += 
+		int tempInertiaDiag = 
 			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate - 1] - field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate + 1];
-		particleList[i].xInertia += particleList[i].yInertia += 
+
+		particleList[i].xInertia += tempInertiaDiag;
+		particleList[i].yInertia += tempInertiaDiag;
+
+		tempInertiaDiag = 
 			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate - 1] - field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate + 1];
+
+		particleList[i].xInertia += tempInertiaDiag;
+		particleList[i].yInertia += tempInertiaDiag;
 
 		//	Calculating the inertia directly above, below, and to the side of the particle
 		particleList[i].xInertia +=
