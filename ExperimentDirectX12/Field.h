@@ -100,26 +100,26 @@ inline void Field::UpdateParticlePosition()
 	{
 		//	Calculating the inertias on the diagonals
 		int tempInertiaDiag = 
-			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate - 1] 
-			- field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate + 1];
+			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate - 1] - 
+			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate + 1];
 
 		particleList[i].xInertia += tempInertiaDiag;
 		particleList[i].yInertia += tempInertiaDiag;
 
 		tempInertiaDiag = 
-			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate - 1] 
-			- field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate + 1];
+			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate - 1] - 
+			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate + 1];
 
 		particleList[i].xInertia += tempInertiaDiag;
 		particleList[i].yInertia += tempInertiaDiag;
 
 		//	Calculating the inertia directly above, below, and to the side of the particle
 		particleList[i].xInertia +=
-			field[particleList[i].yCoordinate][particleList[i].xCoordinate - 1] 
-			- field[particleList[i].yCoordinate][particleList[i].xCoordinate + 1];
+			field[particleList[i].yCoordinate][particleList[i].xCoordinate - 1] - 
+			field[particleList[i].yCoordinate][particleList[i].xCoordinate + 1];
 		particleList[i].yInertia += 
-			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate] 
-			- field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate];
+			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate] - 
+			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate];
 	}
 
 	// Move the particle by removing from its old position and placing it at the new one
