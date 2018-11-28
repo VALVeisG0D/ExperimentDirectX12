@@ -11,8 +11,10 @@ class Field
 	{
 		int xCoordinate;
 		int xInertia;
+		int xPositionChange;
 		int yCoordinate;
 		int yInertia;
+		int yPositionChange;
 	};
 
 	Particle* particleList;
@@ -70,7 +72,7 @@ inline void Field::AddParticle(int yCoordinate, int xCoordinate)
 	field[yCoordinate + 1][xCoordinate + 1] += 1;
 
 	field[yCoordinate][xCoordinate - 1] += 1;
-	field[yCoordinate][xCoordinate] += 64;
+	field[yCoordinate][xCoordinate] += 64;	//	Flaw in logic, what if two particles are heading towards each other?
 	field[yCoordinate][xCoordinate + 1] += 1;
 
 	field[yCoordinate - 1][xCoordinate - 1] += 1;
@@ -133,15 +135,40 @@ inline void Field::UpdateParticlePosition()
 		particleList[i].yInertia += 
 			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate] - 
 			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate];
+
+		//	Calculating the magnitude of the change in position due to inertia
+		//	Will be used to determine if particle moves by 1 unit
+		particleList[i].xPositionChange += particleList[i].xInertia;
+		particleList[i].yPositionChange += particleList[i].yInertia;
 	}
+
+	int negativePart = 0;
+	int positivePart = 0;
+	int offset = 0;
 
 	// Move the particle by removing from its old position and placing it at the new one
 	// What if they are at the same position? Then try not to put particles in the same position
 	for (size_t i = 0; i < DEFAULT_NUMBER_OF_PARTICLES; ++i)
 	{
 		RemoveParticle(particleList[i].yCoordinate, particleList[i].xCoordinate);
-		AddParticle(particleList[i].yCoordinate += particleList[i].yInertia, 
-			particleList[i].xCoordinate += particleList[i].xInertia);
+
+		//	Logic for moving the particle by 1 unit only if the magnitude of the change in position
+		//	is large enough
+		offset = particleList[i].xPositionChange + 6;
+		positivePart = (0xfe00 >> offset) & 1;
+		negativePart = (0x000f >> offset) & 1;
+		particleList[i].xCoordinate += positivePart - negativePart;
+		particleList[i].xPositionChange += 
+			(negativePart + positivePart) * -particleList[i].xPositionChange;
+
+		offset = particleList[i].yPositionChange + 6;
+		positivePart = (0xfe00 >> offset) & 1;
+		negativePart = (0x000f >> offset) & 1;
+		particleList[i].yCoordinate += positivePart - negativePart;
+		particleList[i].yPositionChange += 
+			(negativePart + positivePart) * -particleList[i].yPositionChange;
+
+		AddParticle(particleList[i].yCoordinate, particleList[i].xCoordinate);
 	}
 }
 
