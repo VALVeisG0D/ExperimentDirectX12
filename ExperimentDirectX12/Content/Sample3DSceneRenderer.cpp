@@ -301,9 +301,6 @@ void Sample3DSceneRenderer::Update(DX::StepTimer const& timer)
 			// Rotate the cube a small amount.
 			//m_angle += static_cast<float>(timer.GetElapsedSeconds()) * m_radiansPerSecond;
 
-			static float accumulate = 0.0f;
-			m_angle = XMScalarSin(accumulate += 0.002f);
-
 			field.UpdateParticlePosition();
 
 			//Rotate(m_angle);
