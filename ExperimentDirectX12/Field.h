@@ -109,7 +109,7 @@ inline void Field::UpdateParticlePosition()
 			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate + 1];
 
 		particleList[i].xInertia += tempInertiaDiag;
-		particleList[i].yInertia += tempInertiaDiag;
+		particleList[i].yInertia -= tempInertiaDiag;
 
 		//	o-o-x
 		//	o-o-o
