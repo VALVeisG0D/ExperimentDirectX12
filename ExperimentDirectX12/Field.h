@@ -55,6 +55,9 @@ Field::Field()
 		particleList[1].xCoordinate = coordinateToFieldIndex(0));
 	AddParticle(particleList[2].yCoordinate = coordinateToFieldIndex(0), 
 		particleList[2].xCoordinate = coordinateToFieldIndex(2));
+
+	//testing inertia
+	particleList[1].xInertia = -1;
 }
 
 Field::~Field()
@@ -154,9 +157,14 @@ inline void Field::UpdateParticlePosition()
 
 		//	Logic for moving the particle by 1 unit only if the magnitude of the change in position
 		//	is large enough
+		//	Range of the offset is from 3 to 9 to prevent having a negative offset for bit shifting
+		//	1111 1110 0000 0000 & 0000 0000 0000 0001 = 1 if offset is 9 or more (move in positive
+		//		direction by 1 unit
+		//	0000 0000 0000 1111 & 0000 0000 0000 0001 = 1 if offset is 3 or less (move in negative
+		//		direction by 1 unit
 		offset = particleList[i].xPositionChange + 6;
-		positivePart = (0xfe00 >> offset) & 1;
-		negativePart = (0x000f >> offset) & 1;
+		positivePart = (0xfe00 >> offset) & 1;		
+		negativePart = (0x000f >> offset) & 1;		
 		particleList[i].xCoordinate += positivePart - negativePart;
 		particleList[i].xPositionChange += 
 			(negativePart + positivePart) * -particleList[i].xPositionChange;
