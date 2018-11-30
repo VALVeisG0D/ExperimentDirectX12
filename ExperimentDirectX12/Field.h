@@ -75,7 +75,7 @@ inline void Field::AddParticle(int yCoordinate, int xCoordinate)
 	field[yCoordinate + 1][xCoordinate + 1] += 1;
 
 	field[yCoordinate][xCoordinate - 1] += 1;
-	field[yCoordinate][xCoordinate] += 64;	//	Flaw in logic, what if two particles are heading towards each other?
+	field[yCoordinate][xCoordinate] += 1;	//	Flaw in logic, what if two particles are heading towards each other?
 	field[yCoordinate][xCoordinate + 1] += 1;
 
 	field[yCoordinate - 1][xCoordinate - 1] += 1;
@@ -90,7 +90,7 @@ inline void Field::RemoveParticle(int yCoordinate, int xCoordinate)
 	field[yCoordinate + 1][xCoordinate + 1] -= 1;
 
 	field[yCoordinate][xCoordinate - 1] -= 1;
-	field[yCoordinate][xCoordinate] -= 64;
+	field[yCoordinate][xCoordinate] -= 1;
 	field[yCoordinate][xCoordinate + 1] -= 1;
 
 	field[yCoordinate - 1][xCoordinate - 1] -= 1;
