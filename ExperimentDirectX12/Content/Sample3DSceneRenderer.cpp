@@ -308,7 +308,7 @@ void Sample3DSceneRenderer::Update(DX::StepTimer const& timer)
 			{
 				{ XMFLOAT3(field.xFieldIndexToCoordinate(0), field.yFieldIndexToCoordinate(0), 0.0f), XMFLOAT3(1.0f, 1.0f, 1.0f) },
 			{ XMFLOAT3(field.xFieldIndexToCoordinate(1), field.yFieldIndexToCoordinate(1), 0.0f), XMFLOAT3(1.0f, 1.0f, 1.0f) },
-			{ XMFLOAT3(field.xFieldIndexToCoordinate(2), field.yFieldIndexToCoordinate(2), 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) }
+			{ XMFLOAT3(field.xFieldIndexToCoordinate(2), field.yFieldIndexToCoordinate(2), 0.0f), XMFLOAT3(1.0f, 1.0f, 1.0f) }
 			};
 
 			UpdateVertexBuffer(sizeof(instanceData), instanceData, instanceBufferUpload);
@@ -442,7 +442,7 @@ bool Sample3DSceneRenderer::Render()
 		// Record drawing commands.
 		D3D12_CPU_DESCRIPTOR_HANDLE renderTargetView = m_deviceResources->GetRenderTargetView();
 		D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = m_deviceResources->GetDepthStencilView();
-		m_commandList->ClearRenderTargetView(renderTargetView, DirectX::Colors::CornflowerBlue, 0, nullptr);
+		m_commandList->ClearRenderTargetView(renderTargetView, DirectX::Colors::Black, 0, nullptr);
 		m_commandList->ClearDepthStencilView(depthStencilView, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 		m_commandList->OMSetRenderTargets(1, &renderTargetView, false, &depthStencilView);
