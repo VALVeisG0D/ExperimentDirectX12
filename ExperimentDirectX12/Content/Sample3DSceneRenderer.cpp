@@ -306,9 +306,9 @@ void Sample3DSceneRenderer::Update(DX::StepTimer const& timer)
 			//Rotate(m_angle);
 			VertexPositionColor instanceData[] =
 			{
-				{ XMFLOAT3(field.xFieldIndexToCoordinate(0), field.yFieldIndexToCoordinate(0), 0.0f), XMFLOAT3(1.0f, 1.0f, 1.0f) },
+				{ XMFLOAT3(field.xFieldIndexToCoordinate(0), field.yFieldIndexToCoordinate(0), 0.0f), XMFLOAT3(0.0f, 1.0f, 1.0f) },
 			{ XMFLOAT3(field.xFieldIndexToCoordinate(1), field.yFieldIndexToCoordinate(1), 0.0f), XMFLOAT3(1.0f, 1.0f, 1.0f) },
-			{ XMFLOAT3(field.xFieldIndexToCoordinate(2), field.yFieldIndexToCoordinate(2), 0.0f), XMFLOAT3(1.0f, 1.0f, 1.0f) }
+			{ XMFLOAT3(field.xFieldIndexToCoordinate(2), field.yFieldIndexToCoordinate(2), 0.0f), XMFLOAT3(1.0f, 0.75f, 0.79f) }
 			};
 
 			UpdateVertexBuffer(sizeof(instanceData), instanceData, instanceBufferUpload);
