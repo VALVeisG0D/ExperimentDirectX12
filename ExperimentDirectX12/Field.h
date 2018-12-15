@@ -139,6 +139,13 @@ inline void Field::UpdateParticlePosition()
 			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate] - 
 			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate];
 
+		particleList[i].xInertia = (3 * ((0xffe000 >> (particleList[i].xInertia + 10)) & 1))
+			+ (particleList[i].xInertia * ((0x01f80 >> (particleList[i].xInertia + 10)) & 1))
+			+ (-3 * ((0x0007f >> (particleList[i].xInertia + 10)) & 1));
+		particleList[i].yInertia = (3 * ((0xffe000 >> (particleList[i].yInertia + 10)) & 1))
+			+ (particleList[i].yInertia * ((0x01f80 >> (particleList[i].yInertia + 10)) & 1))
+			+ (-3 * ((0x0007f >> (particleList[i].yInertia + 10)) & 1));
+
 		//	Calculating the magnitude of the change in position due to inertia
 		//	Will be used to determine if particle moves by 1 unit
 		particleList[i].xPositionChange += particleList[i].xInertia;
