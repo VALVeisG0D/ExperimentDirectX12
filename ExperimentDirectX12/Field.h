@@ -55,9 +55,6 @@ Field::Field()
 		particleList[1].xCoordinate = coordinateToFieldIndex(0));
 	AddParticle(particleList[2].yCoordinate = coordinateToFieldIndex(0), 
 		particleList[2].xCoordinate = coordinateToFieldIndex(2));
-
-	//testing inertia
-	particleList[1].xInertia = -1;
 }
 
 Field::~Field()
