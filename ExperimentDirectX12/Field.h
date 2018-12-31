@@ -54,7 +54,7 @@ Field::Field()
 	AddParticle(particleList[1].yCoordinate = coordinateToFieldIndex(0), 
 		particleList[1].xCoordinate = coordinateToFieldIndex(4));
 	AddParticle(particleList[2].yCoordinate = coordinateToFieldIndex(2), 
-		particleList[2].xCoordinate = coordinateToFieldIndex(6));
+		particleList[2].xCoordinate = coordinateToFieldIndex(5));
 }
 
 Field::~Field()
