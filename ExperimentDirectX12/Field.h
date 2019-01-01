@@ -1,7 +1,7 @@
 // Speed of light exists because the computer simulating our reality is not powerful enough to perform computation beyond that limit.
 #pragma once
 constexpr auto DEFAULT_DIMENSION = 256;
-constexpr auto DEFAULT_NUMBER_OF_PARTICLES = 3;
+constexpr auto DEFAULT_NUMBER_OF_PARTICLES = 6;
 
 class Field
 {
@@ -50,11 +50,17 @@ Field::Field()
 	
 	// Add particles
 	AddParticle(particleList[0].yCoordinate = coordinateToFieldIndex(0), 
-		particleList[0].xCoordinate = coordinateToFieldIndex(-5));
+		particleList[0].xCoordinate = coordinateToFieldIndex(-2));
 	AddParticle(particleList[1].yCoordinate = coordinateToFieldIndex(0), 
-		particleList[1].xCoordinate = coordinateToFieldIndex(4));
-	AddParticle(particleList[2].yCoordinate = coordinateToFieldIndex(2), 
-		particleList[2].xCoordinate = coordinateToFieldIndex(5));
+		particleList[1].xCoordinate = coordinateToFieldIndex(0));
+	AddParticle(particleList[2].yCoordinate = coordinateToFieldIndex(0), 
+		particleList[2].xCoordinate = coordinateToFieldIndex(2));
+	AddParticle(particleList[3].yCoordinate = coordinateToFieldIndex(2),
+		particleList[3].xCoordinate = coordinateToFieldIndex(-2));
+	AddParticle(particleList[4].yCoordinate = coordinateToFieldIndex(2),
+		particleList[4].xCoordinate = coordinateToFieldIndex(0));
+	AddParticle(particleList[5].yCoordinate = coordinateToFieldIndex(2),
+		particleList[5].xCoordinate = coordinateToFieldIndex(2));
 }
 
 Field::~Field()
