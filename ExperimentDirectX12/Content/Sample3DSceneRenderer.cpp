@@ -129,7 +129,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 			{XMFLOAT3(field.xFieldIndexToCoordinate(2), field.yFieldIndexToCoordinate(2), 0.0f), XMFLOAT3(1.0f, 0.75f, 0.79f)},
 			{XMFLOAT3(field.xFieldIndexToCoordinate(3), field.yFieldIndexToCoordinate(3), 0.0f), XMFLOAT3(0.0f, 1.0f, 1.0f)},
 			{XMFLOAT3(field.xFieldIndexToCoordinate(4), field.yFieldIndexToCoordinate(4), 0.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)},
-			{XMFLOAT3(field.xFieldIndexToCoordinate(5), field.yFieldIndexToCoordinate(5), 0.0f), XMFLOAT3(1.0f, 0.75f, 0.79f)},
+			{XMFLOAT3(field.xFieldIndexToCoordinate(5), field.yFieldIndexToCoordinate(5), 0.0f), XMFLOAT3(1.0f, 0.75f, 0.79f)}
 		};
 
 		const UINT instanceBufferSize = sizeof(instanceData);
