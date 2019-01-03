@@ -15,6 +15,9 @@ class Field
 		int yCoordinate;
 		int yInertia;
 		int yPositionChange;
+		int zCoordinate;
+		int zInertia;
+		int zPositionChange;
 	};
 
 	Particle* particleList;
@@ -28,6 +31,7 @@ public:
 	void UpdateParticlePosition();
 	float xFieldIndexToCoordinate(int);
 	float yFieldIndexToCoordinate(int);
+	float zFieldIndexToCoordinate(int);
 	size_t coordinateToFieldIndex(int);
 };
 
@@ -199,6 +203,11 @@ inline float Field::xFieldIndexToCoordinate(int particleListNumber)
 inline float Field::yFieldIndexToCoordinate(int particleListNumber)
 {
 	return (particleList[particleListNumber].yCoordinate - ((float)DEFAULT_DIMENSION / 2.0f)) * 0.01f;
+}
+
+inline float Field::zFieldIndexToCoordinate(int particleListNumber)
+{
+	return (particleList[particleListNumber].zCoordinate - ((float)DEFAULT_DIMENSION / 2.0f)) * 0.01f;
 }
 
 //	Convert from coordinate to index
