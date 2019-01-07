@@ -5,7 +5,7 @@ constexpr auto DEFAULT_NUMBER_OF_PARTICLES = 6;
 
 class Field
 {
-	int (*field)[DEFAULT_DIMENSION];
+	int (*field)[DEFAULT_DIMENSION][DEFAULT_DIMENSION];
 
 	struct Particle
 	{
@@ -38,7 +38,7 @@ public:
 Field::Field()
 {
 	// Create field array and particles
-	field = new int[DEFAULT_DIMENSION][DEFAULT_DIMENSION]();
+	field = new int[DEFAULT_DIMENSION][DEFAULT_DIMENSION][DEFAULT_DIMENSION]();
 	particleList = new Particle[DEFAULT_NUMBER_OF_PARTICLES]();
 
 	// Create barrier along edge of field so that particles don't
