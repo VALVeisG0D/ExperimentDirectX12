@@ -41,10 +41,14 @@ Field::Field()
 	field = new int[DEFAULT_DIMENSION][DEFAULT_DIMENSION][DEFAULT_DIMENSION]();
 	particleList = new Particle[DEFAULT_NUMBER_OF_PARTICLES]();
 
-	// Create barrier along edge of field so that particles don't
+	// Create barrier along edge plane of field so that particles don't
 	// go out of bound
 
-	//	Top and bottom edge
+	//	Top and bottom plane
+	for (int x = 0; x < DEFAULT_DIMENSION; ++x)
+		for (int z = 0; z < DEFAULT_DIMENSION; ++z)
+			field[z][DEFAULT_DIMENSION][x] = 
+
 	for (int x = 0; x < DEFAULT_DIMENSION; ++x)
 		field[0][x] = field[DEFAULT_DIMENSION - 1][x] = 1;
 
