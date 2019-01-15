@@ -50,7 +50,14 @@ Field::Field()
 			field[DEFAULT_DIMENSION - 1][x][z] = field[0][x][z] = 1;
 
 	//	Left and Right plane
-	
+	for (int y = 0; y < DEFAULT_DIMENSION; ++y)
+		for (int z = 0; z < DEFAULT_DIMENSION; ++z)
+			field[y][0][z] = field[y][DEFAULT_DIMENSION - 1][z] = 1;
+
+	//	Front and Back plane
+	for (int x = 0; x < DEFAULT_DIMENSION; ++x)
+		for (int y = 0; y < DEFAULT_DIMENSION; ++y)
+			field[y][x][DEFAULT_DIMENSION - 1] = field[y][x][0] = 1;
 
 	//for (int x = 0; x < DEFAULT_DIMENSION; ++x)
 	//	field[0][x] = field[DEFAULT_DIMENSION - 1][x] = 1;
@@ -79,7 +86,7 @@ Field::~Field()
 	delete[] particleList;
 }
 
-inline void Field::AddParticle(int yCoordinate, int xCoordinate)
+inline void Field::AddParticle(int yCoordinate, int xCoordinate, int zCoordinate)
 {
 	//convert coordinate value to index value
 	//what the hell value to give to that field coordinate
@@ -96,7 +103,7 @@ inline void Field::AddParticle(int yCoordinate, int xCoordinate)
 	field[yCoordinate - 1][xCoordinate + 1] += 1;
 }
 
-inline void Field::RemoveParticle(int yCoordinate, int xCoordinate)
+inline void Field::RemoveParticle(int yCoordinate, int xCoordinate, int zCoordinate)
 {
 	field[yCoordinate + 1][xCoordinate - 1] -= 1;
 	field[yCoordinate + 1][xCoordinate] -= 1;
