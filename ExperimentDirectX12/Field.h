@@ -26,8 +26,8 @@ public:
 	Field();
 	~Field();
 
-	void AddParticle(int, int);
-	void RemoveParticle(int, int);
+	void AddParticle(int, int, int);
+	void RemoveParticle(int, int, int);
 	void UpdateParticlePosition();
 	float xFieldIndexToCoordinate(int);
 	float yFieldIndexToCoordinate(int);
