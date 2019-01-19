@@ -67,17 +67,23 @@ Field::Field()
 	
 	// Add particles
 	AddParticle(particleList[0].yCoordinate = coordinateToFieldIndex(0), 
-		particleList[0].xCoordinate = coordinateToFieldIndex(-2));
+		particleList[0].xCoordinate = coordinateToFieldIndex(-2),
+		particleList[0].zCoordinate = coordinateToFieldIndex(0));
 	AddParticle(particleList[1].yCoordinate = coordinateToFieldIndex(0), 
-		particleList[1].xCoordinate = coordinateToFieldIndex(0));
+		particleList[1].xCoordinate = coordinateToFieldIndex(0),
+		particleList[1].zCoordinate = coordinateToFieldIndex(0));
 	AddParticle(particleList[2].yCoordinate = coordinateToFieldIndex(0), 
-		particleList[2].xCoordinate = coordinateToFieldIndex(2));
+		particleList[2].xCoordinate = coordinateToFieldIndex(2),
+		particleList[2].zCoordinate = coordinateToFieldIndex(0));
 	AddParticle(particleList[3].yCoordinate = coordinateToFieldIndex(2),
-		particleList[3].xCoordinate = coordinateToFieldIndex(-2));
+		particleList[3].xCoordinate = coordinateToFieldIndex(-2),
+		particleList[3].zCoordinate = coordinateToFieldIndex(0));
 	AddParticle(particleList[4].yCoordinate = coordinateToFieldIndex(2),
-		particleList[4].xCoordinate = coordinateToFieldIndex(0));
+		particleList[4].xCoordinate = coordinateToFieldIndex(0),
+		particleList[4].zCoordinate = coordinateToFieldIndex(0));
 	AddParticle(particleList[5].yCoordinate = coordinateToFieldIndex(2),
-		particleList[5].xCoordinate = coordinateToFieldIndex(2));
+		particleList[5].xCoordinate = coordinateToFieldIndex(2),
+		particleList[5].zCoordinate = coordinateToFieldIndex(0));
 }
 
 Field::~Field()
@@ -88,34 +94,32 @@ Field::~Field()
 
 inline void Field::AddParticle(int yCoordinate, int xCoordinate, int zCoordinate)
 {
-	//convert coordinate value to index value
-	//what the hell value to give to that field coordinate
-	field[yCoordinate + 1][xCoordinate - 1] += 1;
-	field[yCoordinate + 1][xCoordinate] += 1;
-	field[yCoordinate + 1][xCoordinate + 1] += 1;
+	field[yCoordinate + 1][xCoordinate - 1][zCoordinate] += 1;
+	field[yCoordinate + 1][xCoordinate][zCoordinate] += 1;
+	field[yCoordinate + 1][xCoordinate + 1][zCoordinate] += 1;
 
-	field[yCoordinate][xCoordinate - 1] += 1;
-	field[yCoordinate][xCoordinate] += 1;	//	Flaw in logic, what if two particles are heading towards each other?
-	field[yCoordinate][xCoordinate + 1] += 1;
+	field[yCoordinate][xCoordinate - 1][zCoordinate] += 1;
+	field[yCoordinate][xCoordinate][zCoordinate] += 1;	
+	field[yCoordinate][xCoordinate + 1][zCoordinate] += 1;
 
-	field[yCoordinate - 1][xCoordinate - 1] += 1;
-	field[yCoordinate - 1][xCoordinate] += 1;
-	field[yCoordinate - 1][xCoordinate + 1] += 1;
+	field[yCoordinate - 1][xCoordinate - 1][zCoordinate] += 1;
+	field[yCoordinate - 1][xCoordinate][zCoordinate] += 1;
+	field[yCoordinate - 1][xCoordinate + 1][zCoordinate] += 1;
 }
 
 inline void Field::RemoveParticle(int yCoordinate, int xCoordinate, int zCoordinate)
 {
-	field[yCoordinate + 1][xCoordinate - 1] -= 1;
-	field[yCoordinate + 1][xCoordinate] -= 1;
-	field[yCoordinate + 1][xCoordinate + 1] -= 1;
+	field[yCoordinate + 1][xCoordinate - 1][zCoordinate] -= 1;
+	field[yCoordinate + 1][xCoordinate][zCoordinate] -= 1;
+	field[yCoordinate + 1][xCoordinate + 1][zCoordinate] -= 1;
 
-	field[yCoordinate][xCoordinate - 1] -= 1;
-	field[yCoordinate][xCoordinate] -= 1;
-	field[yCoordinate][xCoordinate + 1] -= 1;
+	field[yCoordinate][xCoordinate - 1][zCoordinate] -= 1;
+	field[yCoordinate][xCoordinate][zCoordinate] -= 1;
+	field[yCoordinate][xCoordinate + 1][zCoordinate] -= 1;
 
-	field[yCoordinate - 1][xCoordinate - 1] -= 1;
-	field[yCoordinate - 1][xCoordinate] -= 1;
-	field[yCoordinate - 1][xCoordinate + 1] -= 1;
+	field[yCoordinate - 1][xCoordinate - 1][zCoordinate] -= 1;
+	field[yCoordinate - 1][xCoordinate][zCoordinate] -= 1;
+	field[yCoordinate - 1][xCoordinate + 1][zCoordinate] -= 1;
 }
 
 inline void Field::UpdateParticlePosition()
