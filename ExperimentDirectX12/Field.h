@@ -94,6 +94,20 @@ Field::~Field()
 
 inline void Field::AddParticle(int yCoordinate, int xCoordinate, int zCoordinate)
 {
+	//	Top plane
+	field[yCoordinate + 1][xCoordinate - 1][zCoordinate + 1] += 1;
+	field[yCoordinate + 1][xCoordinate][zCoordinate + 1] += 1;
+	field[yCoordinate + 1][xCoordinate + 1][zCoordinate + 1] += 1;
+
+	field[yCoordinate][xCoordinate - 1][zCoordinate + 1] += 1;
+	field[yCoordinate][xCoordinate][zCoordinate + 1] += 1;
+	field[yCoordinate][xCoordinate + 1][zCoordinate + 1] += 1;
+
+	field[yCoordinate - 1][xCoordinate - 1][zCoordinate + 1] += 1;
+	field[yCoordinate - 1][xCoordinate][zCoordinate + 1] += 1;
+	field[yCoordinate - 1][xCoordinate + 1][zCoordinate + 1] += 1;
+
+	//	Middle plane
 	field[yCoordinate + 1][xCoordinate - 1][zCoordinate] += 1;
 	field[yCoordinate + 1][xCoordinate][zCoordinate] += 1;
 	field[yCoordinate + 1][xCoordinate + 1][zCoordinate] += 1;
@@ -105,10 +119,37 @@ inline void Field::AddParticle(int yCoordinate, int xCoordinate, int zCoordinate
 	field[yCoordinate - 1][xCoordinate - 1][zCoordinate] += 1;
 	field[yCoordinate - 1][xCoordinate][zCoordinate] += 1;
 	field[yCoordinate - 1][xCoordinate + 1][zCoordinate] += 1;
+
+	//	Bottom plane
+	field[yCoordinate + 1][xCoordinate - 1][zCoordinate - 1] += 1;
+	field[yCoordinate + 1][xCoordinate][zCoordinate - 1] += 1;
+	field[yCoordinate + 1][xCoordinate + 1][zCoordinate - 1] += 1;
+
+	field[yCoordinate][xCoordinate - 1][zCoordinate - 1] += 1;
+	field[yCoordinate][xCoordinate][zCoordinate - 1] += 1;
+	field[yCoordinate][xCoordinate + 1][zCoordinate - 1] += 1;
+
+	field[yCoordinate - 1][xCoordinate - 1][zCoordinate - 1] += 1;
+	field[yCoordinate - 1][xCoordinate][zCoordinate - 1] += 1;
+	field[yCoordinate - 1][xCoordinate + 1][zCoordinate - 1] += 1;
 }
 
 inline void Field::RemoveParticle(int yCoordinate, int xCoordinate, int zCoordinate)
 {
+	//	Top plane
+	field[yCoordinate + 1][xCoordinate - 1][zCoordinate + 1] -= 1;
+	field[yCoordinate + 1][xCoordinate][zCoordinate + 1] -= 1;
+	field[yCoordinate + 1][xCoordinate + 1][zCoordinate + 1] -= 1;
+
+	field[yCoordinate][xCoordinate - 1][zCoordinate + 1] -= 1;
+	field[yCoordinate][xCoordinate][zCoordinate + 1] -= 1;
+	field[yCoordinate][xCoordinate + 1][zCoordinate + 1] -= 1;
+
+	field[yCoordinate - 1][xCoordinate - 1][zCoordinate + 1] -= 1;
+	field[yCoordinate - 1][xCoordinate][zCoordinate + 1] -= 1;
+	field[yCoordinate - 1][xCoordinate + 1][zCoordinate + 1] -= 1;
+
+	//	Middle plane
 	field[yCoordinate + 1][xCoordinate - 1][zCoordinate] -= 1;
 	field[yCoordinate + 1][xCoordinate][zCoordinate] -= 1;
 	field[yCoordinate + 1][xCoordinate + 1][zCoordinate] -= 1;
@@ -120,6 +161,19 @@ inline void Field::RemoveParticle(int yCoordinate, int xCoordinate, int zCoordin
 	field[yCoordinate - 1][xCoordinate - 1][zCoordinate] -= 1;
 	field[yCoordinate - 1][xCoordinate][zCoordinate] -= 1;
 	field[yCoordinate - 1][xCoordinate + 1][zCoordinate] -= 1;
+
+	//	Bottom plane
+	field[yCoordinate + 1][xCoordinate - 1][zCoordinate - 1] -= 1;
+	field[yCoordinate + 1][xCoordinate][zCoordinate - 1] -= 1;
+	field[yCoordinate + 1][xCoordinate + 1][zCoordinate - 1] -= 1;
+
+	field[yCoordinate][xCoordinate - 1][zCoordinate - 1] -= 1;
+	field[yCoordinate][xCoordinate][zCoordinate - 1] -= 1;
+	field[yCoordinate][xCoordinate + 1][zCoordinate - 1] -= 1;
+
+	field[yCoordinate - 1][xCoordinate - 1][zCoordinate - 1] -= 1;
+	field[yCoordinate - 1][xCoordinate][zCoordinate - 1] -= 1;
+	field[yCoordinate - 1][xCoordinate + 1][zCoordinate - 1] -= 1;
 }
 
 inline void Field::UpdateParticlePosition()
