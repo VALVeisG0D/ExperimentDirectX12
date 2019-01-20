@@ -238,7 +238,7 @@ inline void Field::UpdateParticlePosition()
 	// What if they are at the same position? Then try not to put particles in the same position
 	for (size_t i = 0; i < DEFAULT_NUMBER_OF_PARTICLES; ++i)
 	{
-		RemoveParticle(particleList[i].yCoordinate, particleList[i].xCoordinate);
+		RemoveParticle(particleList[i].yCoordinate, particleList[i].xCoordinate, particleList[i].zCoordinate);
 
 		//	Logic for moving the particle by 1 unit only if the magnitude of the change in position
 		//	is large enough
@@ -261,7 +261,14 @@ inline void Field::UpdateParticlePosition()
 		particleList[i].yPositionChange += 
 			(negativePart + positivePart) * -particleList[i].yPositionChange;
 
-		AddParticle(particleList[i].yCoordinate, particleList[i].xCoordinate);
+		offset = particleList[i].zPositionChange + 6;
+		positivePart = (0xfe00 >> offset) & 1;
+		negativePart = (0x000f >> offset) & 1;
+		particleList[i].zCoordinate += positivePart - negativePart;
+		particleList[i].zPositionChange +=
+			(negativePart + positivePart) * -particleList[i].zPositionChange;
+
+		AddParticle(particleList[i].yCoordinate, particleList[i].xCoordinate, particleList[i].zCoordinate);
 	}
 }
 
