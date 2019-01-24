@@ -187,8 +187,8 @@ inline void Field::UpdateParticlePosition()
 		//	o-o-o
 		//	o-o-x
 		int tempInertiaDiag = 
-			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate - 1] - 
-			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate + 1];
+			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate] - 
+			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate];
 
 		particleList[i].xInertia += tempInertiaDiag;
 		particleList[i].yInertia -= tempInertiaDiag;
@@ -197,8 +197,8 @@ inline void Field::UpdateParticlePosition()
 		//	o-o-o
 		//	x-o-o
 		tempInertiaDiag = 
-			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate - 1] - 
-			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate + 1];
+			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate] - 
+			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate];
 
 		particleList[i].xInertia += tempInertiaDiag;
 		particleList[i].yInertia += tempInertiaDiag;
@@ -208,15 +208,15 @@ inline void Field::UpdateParticlePosition()
 		//	x-o-x
 		//	o-o-o
 		particleList[i].xInertia +=
-			field[particleList[i].yCoordinate][particleList[i].xCoordinate - 1] - 
-			field[particleList[i].yCoordinate][particleList[i].xCoordinate + 1];
+			field[particleList[i].yCoordinate][particleList[i].xCoordinate - 1][particleList[i].zCoordinate] - 
+			field[particleList[i].yCoordinate][particleList[i].xCoordinate + 1][particleList[i].zCoordinate];
 		
 		//	o-x-o
 		//	o-o-o
 		//	o-x-o
 		particleList[i].yInertia += 
-			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate] - 
-			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate];
+			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate][particleList[i].zCoordinate] - 
+			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate][particleList[i].zCoordinate];
 
 
 		//	Clamp the inertia between -3 and 3
