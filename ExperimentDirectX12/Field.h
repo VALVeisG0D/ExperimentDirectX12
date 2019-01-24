@@ -181,12 +181,19 @@ inline void Field::UpdateParticlePosition()
 	// 3 steps: calculate inertia, delete old position, add new position
 	for (size_t i = 0; i < DEFAULT_NUMBER_OF_PARTICLES; ++i)
 	{
+		//	Top plane
+		//	Calculating the inertias on tbe diagonals
+		//	x-o-o
+		//	o-o-o
+		//	o-o-x
+		int tempInertiaDiag = 0;
+
 		//	Middle plane
 		//	Calculating the inertias on the diagonals
 		//	x-o-o
 		//	o-o-o
 		//	o-o-x
-		int tempInertiaDiag = 
+		tempInertiaDiag = 
 			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate] - 
 			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate];
 
@@ -217,6 +224,12 @@ inline void Field::UpdateParticlePosition()
 		particleList[i].yInertia += 
 			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate][particleList[i].zCoordinate] - 
 			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate][particleList[i].zCoordinate];
+
+		//	Bottom plane
+		//	Calculating the inertias on the diagonals
+		//	x-o-o
+		//	o-o-o
+		//	o-o-x
 
 
 		//	Clamp the inertia between -3 and 3
