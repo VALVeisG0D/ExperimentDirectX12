@@ -186,7 +186,20 @@ inline void Field::UpdateParticlePosition()
 		//	x-o-o
 		//	o-o-o
 		//	o-o-x
-		int tempInertiaDiag = 0;
+		int tempInertiaDiag = 
+			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate + 1] - 
+			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate - 1];
+
+		particleList[i].xInertia += tempInertiaDiag;
+		particleList[i].yInertia -= tempInertiaDiag;
+		particleList[i].zInertia -= tempInertiaDiag;
+
+		//	o-o-x
+		//	o-o-o
+		//	x-o-o
+		tempInertiaDiag =
+			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate + 1] -
+			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate - 1];
 
 		//	Middle plane
 		//	Calculating the inertias on the diagonals
