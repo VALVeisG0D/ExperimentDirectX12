@@ -181,8 +181,7 @@ inline void Field::UpdateParticlePosition()
 	// 3 steps: calculate inertia, delete old position, add new position
 	for (size_t i = 0; i < DEFAULT_NUMBER_OF_PARTICLES; ++i)
 	{
-		//	Front and back plane
-		//	Calculating the inertias on tbe diagonals
+		//	Calculating the inertias on the corners
 		//	x-o-o
 		//	o-o-o
 		//	o-o-x
@@ -227,7 +226,7 @@ inline void Field::UpdateParticlePosition()
 		particleList[i].yInertia += tempInertiaDiag;
 		particleList[i].zInertia += tempInertiaDiag;
 
-		//	Calculating the inertia directly above, below, and to the side of the particle
+		//	Calculating the inertia on the edge of the particle on the XZ plane
 		//	o-o-o
 		//	x-o-x
 		//	o-o-o
@@ -248,6 +247,7 @@ inline void Field::UpdateParticlePosition()
 		particleList[i].xInertia += tempInertiaDiag;
 		particleList[i].zInertia -= tempInertiaDiag;
 
+		//	Calculating inertia on the edge of the particle on the YZ plane
 		//	o-x-o
 		//	o-o-o
 		//	o-x-o
@@ -268,8 +268,7 @@ inline void Field::UpdateParticlePosition()
 		particleList[i].yInertia += tempInertiaDiag;
 		particleList[i].zInertia += tempInertiaDiag;
 
-		//	Middle plane
-		//	Calculating the inertias on the diagonals
+		//	Calculating the inertias on the edge of the particle on the XY plane
 		//	x-o-o
 		//	o-o-o
 		//	o-o-x
@@ -288,17 +287,9 @@ inline void Field::UpdateParticlePosition()
 			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate];
 
 		particleList[i].xInertia += tempInertiaDiag;
-		particleList[i].yInertia += tempInertiaDiag;
+		particleList[i].yInertia += tempInertiaDiag;	
 
-		//	z Center
-		//	o-o-o
-		//	o-x-o
-		//	o-o-o
-		particleList[i].zInertia +=
-			field[particleList[i].yCoordinate][particleList[i].xCoordinate][particleList[i].zCoordinate - 1] -
-			field[particleList[i].yCoordinate][particleList[i].xCoordinate][particleList[i].zCoordinate + 1];	
-
-		//	Calculating the inertia directly above, below, and to the side of the particle
+		//	Calculating the center x-inertia
 		//	o-o-o
 		//	x-o-x
 		//	o-o-o
@@ -306,12 +297,21 @@ inline void Field::UpdateParticlePosition()
 			field[particleList[i].yCoordinate][particleList[i].xCoordinate - 1][particleList[i].zCoordinate] - 
 			field[particleList[i].yCoordinate][particleList[i].xCoordinate + 1][particleList[i].zCoordinate];
 		
+		//	Calculating the center y-inertia
 		//	o-x-o
 		//	o-o-o
 		//	o-x-o
 		particleList[i].yInertia += 
 			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate][particleList[i].zCoordinate] - 
 			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate][particleList[i].zCoordinate];
+
+		//	Calculating the center z-inertia
+		//	o-o-o
+		//	o-x-o
+		//	o-o-o
+		particleList[i].zInertia +=
+			field[particleList[i].yCoordinate][particleList[i].xCoordinate][particleList[i].zCoordinate - 1] -
+			field[particleList[i].yCoordinate][particleList[i].xCoordinate][particleList[i].zCoordinate + 1];
 
 		//	Clamp the inertia between -3 and 3
 		particleList[i].xInertia = (3 * ((0xffe000 >> (particleList[i].xInertia + 10)) & 1))
