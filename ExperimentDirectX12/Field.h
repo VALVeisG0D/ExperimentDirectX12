@@ -315,9 +315,9 @@ inline void Field::UpdateParticlePosition()
 
 		//	Clamp the inertia between -9 and 9
 		//	The particleList[i].inertia + 18 part is to avoid shifting using a negative number
-		(9 * (x > 8))
-			+ (x * ((x < 9) && (x > -10)))
-			+ (-9 * (x < -9));
+		(9 & ((x < 9) - 1))
+			+ (x & (((x > 8 || (x < -9))) - 1))
+			- (9 & ((x > -10) - 1));
 
 		particleList[i].xInertia = (9 * ((0xff0000000 >> (particleList[i].xInertia + 18)) & 1)) 
 			+ (particleList[i].xInertia * ((0xffffe00 >> (particleList[i].xInertia + 18)) & 1)) 
