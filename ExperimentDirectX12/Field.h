@@ -314,24 +314,18 @@ inline void Field::UpdateParticlePosition()
 			field[particleList[i].yCoordinate][particleList[i].xCoordinate][particleList[i].zCoordinate + 1];
 
 		//	Clamp the inertia between -9 and 9
-		//	The particleList[i].inertia + 18 part is to avoid shifting using a negative number
-		(9 & ((x < 9) - 1))
-			+ (x & (((x > 8 || (x < -9))) - 1))
-			- (9 & ((x > -10) - 1));
-
-		particleList[i].xInertia = (9 * ((0xff0000000 >> (particleList[i].xInertia + 18)) & 1)) 
-			+ (particleList[i].xInertia * ((0xffffe00 >> (particleList[i].xInertia + 18)) & 1)) 
-			+ (-9 * ((0x001ff >> (particleList[i].xInertia + 18)) & 1));
-		particleList[i].yInertia = (3 * ((0xffe000 >> (particleList[i].yInertia + 10)) & 1))
-			+ (particleList[i].yInertia * ((0x01f80 >> (particleList[i].yInertia + 10)) & 1))
-			+ (-3 * ((0x0007f >> (particleList[i].yInertia + 10)) & 1));
-		particleList[i].zInertia = (3 * ((0xffe000 >> (particleList[i].zInertia + 10)) & 1))
-			+ (particleList[i].zInertia * ((0x01f80 >> (particleList[i].zInertia + 10)) & 1))
-			+ (-3 * ((0x0007f >> (particleList[i].zInertia + 10)) & 1));
-
-		/*particleList[i].yInertia = (3 * ((0xffe000 >> (particleList[i].yInertia + 10)) & 1))
-			+ (particleList[i].yInertia * ((0x01f80 >> (particleList[i].yInertia + 10)) & 1))
-			+ (-3 * ((0x0007f >> (particleList[i].yInertia + 10)) & 1));*/
+		//	(9 & ((x < 9) - 1)) <- Clamp to 9 units of inertia
+		//	+ (x & (((x > 8) || (x < -9)) - 1)) <- inertia will be between -9 and 9
+		//	- (9 & ((x > -10) - 1)); <- Clamp to -9 units of inertia
+		particleList[i].xInertia = (9 & ((particleList[i].xInertia < 9) - 1)) 
+			+ (particleList[i].xInertia & (((particleList[i].xInertia > 8) || (particleList[i].xInertia < -9)) - 1)) 
+			- (9 & ((particleList[i].xInertia > -10) - 1));
+		particleList[i].yInertia = (9 & ((particleList[i].yInertia < 9) - 1))
+			+ (particleList[i].yInertia & (((particleList[i].yInertia > 8) || (particleList[i].yInertia < -9)) - 1))
+			- (9 & ((particleList[i].yInertia > -10) - 1));
+		particleList[i].zInertia = (9 & ((particleList[i].zInertia < 9) - 1))
+			+ (particleList[i].zInertia & (((particleList[i].zInertia > 8) || (particleList[i].zInertia < -9)) - 1))
+			- (9 & ((particleList[i].zInertia > -10) - 1));
 
 		//	Calculating the magnitude of the change in position due to inertia
 		//	Will be used to determine if particle moves by 1 unit
@@ -356,6 +350,7 @@ inline void Field::UpdateParticlePosition()
 		//		direction by 1 unit
 		//	0000 0000 0000 1111 & 0000 0000 0000 0001 = 1 if offset is 3 or less (move in negative
 		//		direction by 1 unit
+		//	REMEMBER! Bit shifting is different for 32 bit numbers vs 64 bit numbers!
 		offset = particleList[i].xPositionChange + 6;
 		positivePart = (0xfe00 >> offset) & 1;		
 		negativePart = (0x000f >> offset) & 1;		
