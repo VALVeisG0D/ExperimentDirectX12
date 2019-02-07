@@ -314,9 +314,9 @@ inline void Field::UpdateParticlePosition()
 			field[particleList[i].yCoordinate][particleList[i].xCoordinate][particleList[i].zCoordinate + 1];
 
 		//	Clamp the inertia between -9 and 9
-		//	(9 & ((x < 9) - 1)) <- Clamp to 9 units of inertia
+		//	(9 & ((x < 9) - 1)) <- Clamp to 9 units of inertia if x is more than 9
 		//	+ (x & (((x > 8) || (x < -9)) - 1)) <- inertia will be between -9 and 9
-		//	- (9 & ((x > -10) - 1)); <- Clamp to -9 units of inertia
+		//	- (9 & ((x > -10) - 1)); <- Clamp to -9 units of inertia if x is less than -9
 		particleList[i].xInertia = (9 & ((particleList[i].xInertia < 9) - 1)) 
 			+ (particleList[i].xInertia & (((particleList[i].xInertia > 8) || (particleList[i].xInertia < -9)) - 1)) 
 			- (9 & ((particleList[i].xInertia > -10) - 1));
