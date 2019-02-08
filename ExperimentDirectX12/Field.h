@@ -351,12 +351,15 @@ inline void Field::UpdateParticlePosition()
 		//	0000 0000 0000 1111 & 0000 0000 0000 0001 = 1 if offset is 3 or less (move in negative
 		//		direction by 1 unit
 		//	REMEMBER! Bit shifting is different for 32 bit numbers vs 64 bit numbers!
+
+		particleList[i].xCoordinate += (particleList[i].xPositionChange >= 9) - (particleList[i].xPositionChange <= -9);
+
 		offset = particleList[i].xPositionChange + 6;
 		positivePart = (0xfe00 >> offset) & 1;		
 		negativePart = (0x000f >> offset) & 1;		
 		particleList[i].xCoordinate += positivePart - negativePart;
 		particleList[i].xPositionChange += 
-			(negativePart + positivePart) * -particleList[i].xPositionChange;
+			(negativePart + positivePart) * -particleList[i].xPositionChange;	//	Reset position change to below movement threshold if threshold is passed
 
 		offset = particleList[i].yPositionChange + 6;
 		positivePart = (0xfe00 >> offset) & 1;
