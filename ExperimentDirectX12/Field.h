@@ -331,6 +331,7 @@ inline void Field::UpdateParticlePosition()
 		//	Will be used to determine if particle moves by 1 unit
 		particleList[i].xPositionChange += particleList[i].xInertia;
 		particleList[i].yPositionChange += particleList[i].yInertia;
+		particleList[i].zPositionChange += particleList[i].zInertia;
 	}
 
 	int negativePart = 0;
