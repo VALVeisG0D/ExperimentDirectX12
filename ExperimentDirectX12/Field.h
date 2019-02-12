@@ -1,7 +1,8 @@
 // Speed of light exists because the computer simulating our reality is not powerful enough to perform computation beyond that limit.
 #pragma once
 constexpr auto DEFAULT_DIMENSION = 256;
-constexpr auto DEFAULT_NUMBER_OF_PARTICLES = 6;
+constexpr auto DEFAULT_NUMBER_OF_PARTICLES = 6;	//	Three places to change in Sample3DSceneRenderer.cpp and 2 in this file to change 
+												//		number of particles
 
 class Field
 {
