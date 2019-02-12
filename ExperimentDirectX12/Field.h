@@ -336,7 +336,6 @@ inline void Field::UpdateParticlePosition()
 
 	int negativePart = 0;
 	int positivePart = 0;
-	int offset = 0;
 
 	// Move the particle by removing from its old position and placing it at the new one
 	// What if they are at the same position? Then try not to put particles in the same position
@@ -346,35 +345,37 @@ inline void Field::UpdateParticlePosition()
 
 		//	Logic for moving the particle by 1 unit only if the magnitude of the change in position
 		//	is large enough
-		//	Range of the offset is from 3 to 9 to prevent having a negative offset for bit shifting
-		//	1111 1110 0000 0000 & 0000 0000 0000 0001 = 1 if offset is 9 or more (move in positive
-		//		direction by 1 unit
-		//	0000 0000 0000 1111 & 0000 0000 0000 0001 = 1 if offset is 3 or less (move in negative
-		//		direction by 1 unit
-		//	REMEMBER! Bit shifting is different for 32 bit numbers vs 64 bit numbers!
+		//	If positivePart is 1, move in positive direction by 1 unit
+		//	If negativePart is 1, move in negative direction by 1 unit
+		//	Coordinate will be incremented by 1 or decremented by -1 if movement threshold is exceeded
+		//		(thereby moving the particle)
+		//	Reset positionChange to below movement threshold if threshold is exceeded
+		//	DEPRECATED: REMEMBER! Bit shifting is different for 32 bit numbers vs 64 bit numbers due to alignment issues
 
-		particleList[i].xCoordinate += (particleList[i].xPositionChange >= 9) - (particleList[i].xPositionChange <= -9);
-
-		offset = particleList[i].xPositionChange + 6;
-		positivePart = (0xfe00 >> offset) & 1;		
-		negativePart = (0x000f >> offset) & 1;		
+		positivePart = particleList[i].xPositionChange > 8;
+		negativePart = particleList[i].xPositionChange < -8;
 		particleList[i].xCoordinate += positivePart - negativePart;
-		particleList[i].xPositionChange += 
-			(negativePart + positivePart) * -particleList[i].xPositionChange;	//	Reset position change to below movement threshold if threshold is passed
+		particleList[i].xPositionChange -=
+			-(negativePart + positivePart) & particleList[i].xPositionChange;
 
-		offset = particleList[i].yPositionChange + 6;
-		positivePart = (0xfe00 >> offset) & 1;
-		negativePart = (0x000f >> offset) & 1;
+		positivePart = particleList[i].yPositionChange > 8;
+		negativePart = particleList[i].yPositionChange < -8;
 		particleList[i].yCoordinate += positivePart - negativePart;
-		particleList[i].yPositionChange += 
-			(negativePart + positivePart) * -particleList[i].yPositionChange;
+		particleList[i].yPositionChange -=
+			-(negativePart + positivePart) & particleList[i].yPositionChange;
 
-		offset = particleList[i].zPositionChange + 6;
-		positivePart = (0xfe00 >> offset) & 1;
-		negativePart = (0x000f >> offset) & 1;
+		positivePart = particleList[i].zPositionChange > 8;
+		negativePart = particleList[i].zPositionChange < -8;
 		particleList[i].zCoordinate += positivePart - negativePart;
-		particleList[i].zPositionChange +=
-			(negativePart + positivePart) * -particleList[i].zPositionChange;
+		particleList[i].zPositionChange -=
+			-(negativePart + positivePart) & particleList[i].zPositionChange;
+
+		//offset = particleList[i].xPositionChange + 6;
+		//positivePart = (0xfe00 >> offset) & 1;		
+		//negativePart = (0x000f >> offset) & 1;		
+		//particleList[i].xCoordinate += positivePart - negativePart;
+		//particleList[i].xPositionChange += 
+		//	(negativePart + positivePart) * -particleList[i].xPositionChange;	
 
 		AddParticle(particleList[i].yCoordinate, particleList[i].xCoordinate, particleList[i].zCoordinate);
 	}
