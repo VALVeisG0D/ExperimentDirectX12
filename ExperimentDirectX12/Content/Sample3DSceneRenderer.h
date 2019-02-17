@@ -21,7 +21,6 @@ namespace ExperimentDirectX12
 
 	private:
 		void LoadState();
-		void Rotate(float radians);
 
 	private:
 		// Constant buffers must be 256-byte aligned.

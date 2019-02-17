@@ -229,7 +229,8 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		m_instanceBufferView.StrideInBytes = sizeof(VertexPositionColor);
 		m_instanceBufferView.SizeInBytes = sizeof(instanceData);
 
-		Rotate(0.0f);		
+		// MY CODE: Initialize model member of constant buffer
+		XMStoreFloat4x4(&m_constantBufferData.model, XMMatrixTranspose(XMMatrixTranslation(0.0f, 0.0f, 0.0f)));
 
 		// Wait for the command list to finish executing; the vertex/index buffers need to be uploaded to the GPU before the upload resources go out of scope.
 		m_deviceResources->WaitForGpu();
@@ -292,19 +293,14 @@ void Sample3DSceneRenderer::Update(DX::StepTimer const& timer)
 {
 	if (m_loadingComplete)
 	{
-		//if (!m_tracking)
 		{
 			DX::ThrowIfFailed(m_deviceResources->GetCommandAllocator()->Reset());
 
 			// The command list can be reset anytime after ExecuteCommandList() is called.
 			DX::ThrowIfFailed(m_commandList->Reset(m_deviceResources->GetCommandAllocator(), m_pipelineState.Get()));
 
-			// Rotate the cube a small amount.
-			//m_angle += static_cast<float>(timer.GetElapsedSeconds()) * m_radiansPerSecond;
-
 			field.UpdateParticlePosition();
 
-			//Rotate(m_angle);
 			VertexPositionColor instanceData[] =
 			{
 			{ XMFLOAT3(field.xFieldIndexToCoordinate(0), field.yFieldIndexToCoordinate(0), field.zFieldIndexToCoordinate(0)), XMFLOAT3(0.0f, 1.0f, 1.0f) },
@@ -377,13 +373,6 @@ void Sample3DSceneRenderer::LoadState()
 		//m_tracking = safe_cast<IPropertyValue^>(state->Lookup(TrackingKey))->GetBoolean();
 		state->Remove(TrackingKey);
 	}
-}
-
-// Rotate the 3D cube model a set amount of radians.
-void Sample3DSceneRenderer::Rotate(float radians)
-{
-	// Prepare to pass the updated model matrix to the shader.
-	XMStoreFloat4x4(&m_constantBufferData.model, XMMatrixTranspose(XMMatrixTranslation(0.0f, 0.0f, -radians)));
 }
 
 // Renders one frame using the vertex and pixel shaders.
