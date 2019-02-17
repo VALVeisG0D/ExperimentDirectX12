@@ -19,11 +19,6 @@ namespace ExperimentDirectX12
 		bool Render();
 		void SaveState();
 
-		void StartTracking();
-		void TrackingUpdate(float positionX);
-		void StopTracking();
-		bool IsTracking() { return m_tracking; }
-
 	private:
 		void LoadState();
 		void Rotate(float radians);
@@ -57,9 +52,7 @@ namespace ExperimentDirectX12
 
 		// Variables used with the rendering loop.
 		bool	m_loadingComplete;
-		float	m_radiansPerSecond;
-		float	m_angle;
-		bool	m_tracking;
+		//bool	m_tracking;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> instanceBufferUpload;
 	};

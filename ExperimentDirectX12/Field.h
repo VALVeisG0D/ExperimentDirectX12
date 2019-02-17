@@ -76,15 +76,15 @@ Field::Field()
 	AddParticle(particleList[2].yCoordinate = coordinateToFieldIndex(0), 
 		particleList[2].xCoordinate = coordinateToFieldIndex(2),
 		particleList[2].zCoordinate = coordinateToFieldIndex(0));
-	AddParticle(particleList[3].yCoordinate = coordinateToFieldIndex(2),
+	AddParticle(particleList[3].yCoordinate = coordinateToFieldIndex(0),
 		particleList[3].xCoordinate = coordinateToFieldIndex(-2),
-		particleList[3].zCoordinate = coordinateToFieldIndex(0));
-	AddParticle(particleList[4].yCoordinate = coordinateToFieldIndex(2),
+		particleList[3].zCoordinate = coordinateToFieldIndex(-2));
+	AddParticle(particleList[4].yCoordinate = coordinateToFieldIndex(0),
 		particleList[4].xCoordinate = coordinateToFieldIndex(0),
-		particleList[4].zCoordinate = coordinateToFieldIndex(0));
-	AddParticle(particleList[5].yCoordinate = coordinateToFieldIndex(2),
+		particleList[4].zCoordinate = coordinateToFieldIndex(-2));
+	AddParticle(particleList[5].yCoordinate = coordinateToFieldIndex(0),
 		particleList[5].xCoordinate = coordinateToFieldIndex(2),
-		particleList[5].zCoordinate = coordinateToFieldIndex(0));
+		particleList[5].zCoordinate = coordinateToFieldIndex(-2));
 }
 
 Field::~Field()

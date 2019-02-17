@@ -23,9 +23,7 @@ Field field;
 // Loads vertex and pixel shaders from files and instantiates the cube geometry.
 Sample3DSceneRenderer::Sample3DSceneRenderer(const std::shared_ptr<DX::DeviceResources>& deviceResources) :
 	m_loadingComplete(false),
-	m_radiansPerSecond(-XM_PIDIV4),	// rotate 45 degrees per second
-	m_angle(0),
-	m_tracking(false),
+	//m_tracking(false),
 	m_mappedConstantBuffer(nullptr),
 	m_deviceResources(deviceResources)
 {
@@ -294,7 +292,7 @@ void Sample3DSceneRenderer::Update(DX::StepTimer const& timer)
 {
 	if (m_loadingComplete)
 	{
-		if (!m_tracking)
+		//if (!m_tracking)
 		{
 			DX::ThrowIfFailed(m_deviceResources->GetCommandAllocator()->Reset());
 
@@ -363,8 +361,7 @@ void Sample3DSceneRenderer::SaveState()
 		state->Remove(TrackingKey);
 	}
 
-	state->Insert(AngleKey, PropertyValue::CreateSingle(m_angle));
-	state->Insert(TrackingKey, PropertyValue::CreateBoolean(m_tracking));
+	//state->Insert(TrackingKey, PropertyValue::CreateBoolean(m_tracking));
 }
 
 // Restores the previous state of the renderer.
@@ -373,12 +370,11 @@ void Sample3DSceneRenderer::LoadState()
 	auto state = ApplicationData::Current->LocalSettings->Values;
 	if (state->HasKey(AngleKey))
 	{
-		m_angle = safe_cast<IPropertyValue^>(state->Lookup(AngleKey))->GetSingle();
 		state->Remove(AngleKey);
 	}
 	if (state->HasKey(TrackingKey))
 	{
-		m_tracking = safe_cast<IPropertyValue^>(state->Lookup(TrackingKey))->GetBoolean();
+		//m_tracking = safe_cast<IPropertyValue^>(state->Lookup(TrackingKey))->GetBoolean();
 		state->Remove(TrackingKey);
 	}
 }
@@ -388,26 +384,6 @@ void Sample3DSceneRenderer::Rotate(float radians)
 {
 	// Prepare to pass the updated model matrix to the shader.
 	XMStoreFloat4x4(&m_constantBufferData.model, XMMatrixTranspose(XMMatrixTranslation(0.0f, 0.0f, -radians)));
-}
-
-void Sample3DSceneRenderer::StartTracking()
-{
-	m_tracking = true;
-}
-
-// When tracking, the 3D cube can be rotated around its Y axis by tracking pointer position relative to the output screen width.
-void Sample3DSceneRenderer::TrackingUpdate(float positionX)
-{
-	if (m_tracking)
-	{
-		float radians = XM_2PI * 2.0f * positionX / m_deviceResources->GetOutputSize().Width;
-		Rotate(radians);
-	}
-}
-
-void Sample3DSceneRenderer::StopTracking()
-{
-	m_tracking = false;
 }
 
 // Renders one frame using the vertex and pixel shaders.
