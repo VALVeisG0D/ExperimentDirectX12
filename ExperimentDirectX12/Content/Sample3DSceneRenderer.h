@@ -17,10 +17,6 @@ namespace ExperimentDirectX12
 		void Update(DX::StepTimer const& timer);
 		void UpdateVertexBuffer(UINT dataBufferSize, VertexPositionColor *data, Microsoft::WRL::ComPtr<ID3D12Resource> &dataBufferUpload);
 		bool Render();
-		void SaveState();
-
-	private:
-		void LoadState();
 
 	private:
 		// Constant buffers must be 256-byte aligned.
@@ -37,6 +33,7 @@ namespace ExperimentDirectX12
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>		m_cbvHeap;
 		Microsoft::WRL::ComPtr<ID3D12Resource>				m_vertexBuffer;
 		Microsoft::WRL::ComPtr<ID3D12Resource>				m_instanceBuffer;
+		Microsoft::WRL::ComPtr<ID3D12Resource>				instanceBufferUpload;
 		Microsoft::WRL::ComPtr<ID3D12Resource>				m_indexBuffer;
 		Microsoft::WRL::ComPtr<ID3D12Resource>				m_constantBuffer;
 		ModelViewProjectionConstantBuffer					m_constantBufferData;
@@ -50,10 +47,7 @@ namespace ExperimentDirectX12
 		D3D12_INDEX_BUFFER_VIEW								m_indexBufferView;
 
 		// Variables used with the rendering loop.
-		bool	m_loadingComplete;
-		//bool	m_tracking;
-
-		Microsoft::WRL::ComPtr<ID3D12Resource> instanceBufferUpload;
+		bool	m_loadingComplete;	
 	};
 }
 

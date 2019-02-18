@@ -14,20 +14,14 @@ using namespace Microsoft::WRL;
 using namespace Windows::Foundation;
 using namespace Windows::Storage;
 
-// Indices into the application state map.
-Platform::String^ AngleKey = "Angle";
-Platform::String^ TrackingKey = "Tracking";
-
 Field field;
 
 // Loads vertex and pixel shaders from files and instantiates the cube geometry.
 Sample3DSceneRenderer::Sample3DSceneRenderer(const std::shared_ptr<DX::DeviceResources>& deviceResources) :
 	m_loadingComplete(false),
-	//m_tracking(false),
 	m_mappedConstantBuffer(nullptr),
 	m_deviceResources(deviceResources)
 {
-	LoadState();
 	ZeroMemory(&m_constantBufferData, sizeof(m_constantBufferData));
 
 	CreateDeviceDependentResources();
@@ -160,18 +154,6 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		NAME_D3D12_OBJECT(m_instanceBuffer);
 
 		// Upload the instance buffer to the GPU.
-		/*{
-			D3D12_SUBRESOURCE_DATA instanceDataUpload = {};
-			instanceDataUpload.pData = reinterpret_cast<BYTE*>(instanceData);
-			instanceDataUpload.RowPitch = instanceBufferSize;
-			instanceDataUpload.SlicePitch = instanceDataUpload.RowPitch;
-
-			UpdateSubresources(m_commandList.Get(), m_instanceBuffer.Get(), instanceBufferUpload.Get(), 0, 0, 1, &instanceDataUpload);
-
-			CD3DX12_RESOURCE_BARRIER instanceBufferResourceBarrier =
-				CD3DX12_RESOURCE_BARRIER::Transition(m_instanceBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-			m_commandList->ResourceBarrier(1, &instanceBufferResourceBarrier);
-		}*/
 		UpdateVertexBuffer(instanceBufferSize, instanceData, instanceBufferUpload);
 
 		// Create a descriptor heap for the constant buffers.
@@ -341,38 +323,6 @@ void ExperimentDirectX12::Sample3DSceneRenderer::UpdateVertexBuffer(UINT dataBuf
 	CD3DX12_RESOURCE_BARRIER instanceBufferResourceBarrier =
 		CD3DX12_RESOURCE_BARRIER::Transition(m_instanceBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 	m_commandList->ResourceBarrier(1, &instanceBufferResourceBarrier);
-}
-
-// Saves the current state of the renderer.
-void Sample3DSceneRenderer::SaveState()
-{
-	auto state = ApplicationData::Current->LocalSettings->Values;
-
-	if (state->HasKey(AngleKey))
-	{
-		state->Remove(AngleKey);
-	}
-	if (state->HasKey(TrackingKey))
-	{
-		state->Remove(TrackingKey);
-	}
-
-	//state->Insert(TrackingKey, PropertyValue::CreateBoolean(m_tracking));
-}
-
-// Restores the previous state of the renderer.
-void Sample3DSceneRenderer::LoadState()
-{
-	auto state = ApplicationData::Current->LocalSettings->Values;
-	if (state->HasKey(AngleKey))
-	{
-		state->Remove(AngleKey);
-	}
-	if (state->HasKey(TrackingKey))
-	{
-		//m_tracking = safe_cast<IPropertyValue^>(state->Lookup(TrackingKey))->GetBoolean();
-		state->Remove(TrackingKey);
-	}
 }
 
 // Renders one frame using the vertex and pixel shaders.

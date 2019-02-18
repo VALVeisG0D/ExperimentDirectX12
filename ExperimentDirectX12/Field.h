@@ -33,7 +33,7 @@ public:
 	float xFieldIndexToCoordinate(int);
 	float yFieldIndexToCoordinate(int);
 	float zFieldIndexToCoordinate(int);
-	size_t coordinateToFieldIndex(int);
+	int coordinateToFieldIndex(int);
 };
 
 Field::Field()
@@ -59,12 +59,6 @@ Field::Field()
 	for (int x = 0; x < DEFAULT_DIMENSION; ++x)
 		for (int y = 0; y < DEFAULT_DIMENSION; ++y)
 			field[y][x][DEFAULT_DIMENSION - 1] = field[y][x][0] = 1;
-
-	//for (int x = 0; x < DEFAULT_DIMENSION; ++x)
-	//	field[0][x] = field[DEFAULT_DIMENSION - 1][x] = 1;
-
-	//for (int y = 1; y < DEFAULT_DIMENSION - 1; ++y)
-	//	field[y][0] = field[y][DEFAULT_DIMENSION - 1] = 1;
 	
 	// Add particles
 	AddParticle(particleList[0].yCoordinate = coordinateToFieldIndex(0), 
@@ -371,13 +365,6 @@ inline void Field::UpdateParticlePosition()
 		particleList[i].zPositionChange -=
 			-(negativePart + positivePart) & particleList[i].zPositionChange;
 
-		//offset = particleList[i].xPositionChange + 6;
-		//positivePart = (0xfe00 >> offset) & 1;		
-		//negativePart = (0x000f >> offset) & 1;		
-		//particleList[i].xCoordinate += positivePart - negativePart;
-		//particleList[i].xPositionChange += 
-		//	(negativePart + positivePart) * -particleList[i].xPositionChange;	
-
 		AddParticle(particleList[i].yCoordinate, particleList[i].xCoordinate, particleList[i].zCoordinate);
 	}
 }
@@ -399,7 +386,7 @@ inline float Field::zFieldIndexToCoordinate(int particleListNumber)
 }
 
 //	Convert from coordinate to index
-inline size_t Field::coordinateToFieldIndex(int coordinate)
+inline int Field::coordinateToFieldIndex(int coordinate)
 {
-	return size_t(coordinate) + (DEFAULT_DIMENSION / 2);
+	return coordinate + (DEFAULT_DIMENSION / 2);
 }
