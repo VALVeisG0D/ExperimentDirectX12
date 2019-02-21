@@ -67,6 +67,7 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="ExperimentDirectX12Main.cpp" />
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="MoveLookController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -75,6 +76,7 @@
     <ClInclude Include="Field.h">
       <Filter>Content</Filter>
     </ClInclude>
+    <ClInclude Include="MoveLookController.h" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest" />
