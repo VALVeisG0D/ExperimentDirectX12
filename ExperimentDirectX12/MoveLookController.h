@@ -9,7 +9,7 @@ using namespace Windows::Devices::Input;
 constexpr auto ROTATION_GAIN = 0.004f;		// Sensitivity adjustment for the look controller
 constexpr auto MOVEMENT_GAIN = 0.1f;		// Sensitivity adjustment for the move controller
 
-class MoveLookController
+ref class MoveLookController
 {
 	// Properties of the controller object
 	DirectX::XMFLOAT3 m_position;		// The position of the controller

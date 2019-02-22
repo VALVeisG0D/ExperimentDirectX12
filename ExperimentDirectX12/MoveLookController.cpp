@@ -122,3 +122,143 @@ void MoveLookController::OnKeyUp(CoreWindow ^ sender, KeyEventArgs ^ args)
 	if (Key == VirtualKey::D)	// Right
 		m_right = false;
 }
+
+void MoveLookController::Initialize(CoreWindow ^ window)
+{
+	// Opt in to receive touch/mouse events.
+	window->PointerPressed +=
+		ref new TypedEventHandler<CoreWindow^, PointerEventArgs^>(this, &MoveLookController::OnPointerPressed);
+
+	window->PointerMoved +=
+		ref new TypedEventHandler<CoreWindow^, PointerEventArgs^>(this, &MoveLookController::OnPointerMoved);
+
+	window->PointerReleased +=
+		ref new TypedEventHandler<CoreWindow^, PointerEventArgs^>(this, &MoveLookController::OnPointerReleased);
+
+	window->KeyDown +=
+		ref new TypedEventHandler<CoreWindow^, KeyEventArgs^>(this, &MoveLookController::OnKeyDown);
+
+	window->KeyUp +=
+		ref new TypedEventHandler<CoreWindow^, KeyEventArgs^>(this, &MoveLookController::OnKeyUp);
+
+	// Initialize the state of the controller
+	m_moveInUse = false;			// No pointer is in the Move control.
+	m_movePointerID = 0;
+
+	m_lookInUse = false;			// No pointer is in the Look control.
+	m_lookPointerID = 0;
+
+	// Need to init this as it is reset every frame.
+	m_moveCommand = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+
+	SetOrientation(0, 0);			// Look straight ahead when the app starts.
+}
+
+void MoveLookController::Update(CoreWindow ^ window)
+{
+	// Check for input from the Move control.
+	if (m_moveInUse)
+	{
+		DirectX::XMFLOAT2 pointerDelta(m_movePointerPosition);
+		pointerDelta.x -= m_moveFirstDown.x;
+		pointerDelta.y -= m_moveFirstDown.y;
+		
+		// Figure out the command from the touch-based virtual joystick.
+		if (pointerDelta.x > 16.0f)		// Leave 32 pixel-wide dead spot for being still.
+			m_moveCommand.x = 1.0f;
+		else
+			if (pointerDelta.x < -16.0f)
+				m_moveCommand.x = -1.0f;
+
+		if (pointerDelta.y > 16.0f)		// Joystick y is up, so change sign.
+			m_moveCommand.y = -1.0f;
+		else
+			if (pointerDelta.y < -16.0f)
+				m_moveCommand.y = 1.0f;
+	}
+
+	// Pole our state bits that are set by the keyboard input events.
+	if (m_forward)
+		m_moveCommand.y += 1.0f;
+	if (m_back)
+		m_moveCommand.y -= 1.0f;
+
+	if (m_left)
+		m_moveCommand.x -= 1.0f;
+	if (m_right)
+		m_moveCommand.x += 1.0f;
+
+	if (m_up)
+		m_moveCommand.z += 1.0f;
+	if (m_down)
+		m_moveCommand.z -= 1.0f;
+
+	// Make sure that 45 degree cases are not faster.
+	DirectX::XMFLOAT3 command = m_moveCommand;
+	DirectX::XMVECTOR vector = DirectX::XMLoadFloat3(&command);
+
+	if (fabsf(command.x) > 0.1f || fabsf(command.y) > 0.1f || fabsf(command.z) > 0.1f)
+	{
+		vector = DirectX::XMVector3Normalize(vector);
+		DirectX::XMStoreFloat3(&command, vector);
+	}
+
+	// Rotate command to align with our direction (world coordinates).
+	DirectX::XMFLOAT3 wCommand;
+	wCommand.x = command.x * cosf(m_yaw) - command.y * sinf(m_yaw);
+	wCommand.y = command.x * sinf(m_yaw) + command.y * cosf(m_yaw);
+	wCommand.z = command.z;
+
+	// Scale for sensitivity adjustment.
+	wCommand.x = wCommand.x * MOVEMENT_GAIN;
+	wCommand.y = wCommand.y * MOVEMENT_GAIN;
+	wCommand.z = wCommand.z * MOVEMENT_GAIN;
+
+	// Our velocity is based on the command.
+	// Also note that y is the up-down axis.
+	DirectX::XMFLOAT3 Velocity;
+	Velocity.x = -wCommand.x;
+	Velocity.z = wCommand.y;
+	Velocity.y = wCommand.z;
+
+	// Integrate
+	m_position.x += Velocity.x;
+	m_position.y += Velocity.y;
+	m_position.z += Velocity.z;
+
+	// Clear movement input accumulator for use during the next frame.
+	m_moveCommand = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+}
+
+void MoveLookController::SetPosition(DirectX::XMFLOAT3 pos)
+{
+	m_position = pos;
+}
+
+// Accessor to set the position of the controller.
+void MoveLookController::SetOrientation(float pitch, float yaw)
+{
+	m_pitch = pitch;
+	m_yaw = yaw;
+}
+
+// Returns the position of the controller object.
+DirectX::XMFLOAT3 MoveLookController::get_Position()
+{
+	return m_position;
+}
+
+DirectX::XMFLOAT3 MoveLookController::get_LookPoint()
+{
+	float y = sinf(m_pitch);			// Vertical
+	float r = cosf(m_pitch);			// In the plane
+	float z = r * cosf(m_yaw);			// Fwd-back
+	float x = r * sinf(m_yaw);			// Left-right
+	DirectX::XMFLOAT3 result(x, y, z);
+	result.x += m_position.x;
+	result.y += m_position.y;
+	result.z += m_position.z;
+
+	// Return m_position + DirectX::XMFLOAT3(x, y, z);
+	return result;
+}
