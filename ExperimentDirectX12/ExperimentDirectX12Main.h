@@ -2,6 +2,7 @@
 
 #include "Common\StepTimer.h"
 #include "Common\DeviceResources.h"
+#include "MoveLookController.h"
 #include "Content\Sample3DSceneRenderer.h"
 
 // Renders Direct3D content on the screen.
@@ -23,6 +24,9 @@ namespace ExperimentDirectX12
 	private:
 		// TODO: Replace with your own content renderers.
 		std::unique_ptr<Sample3DSceneRenderer> m_sceneRenderer;
+
+		// Controller for moving and rotating the camera
+		std::unique_ptr<MoveLookController> m_moveLookController;
 
 		// Rendering loop timer.
 		DX::StepTimer m_timer;
