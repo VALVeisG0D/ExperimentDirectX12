@@ -44,6 +44,7 @@ public:
 	void Initialize(CoreWindow^ window);
 	void Update(CoreWindow^ window);
 
+internal:
 	// Accessor to set position of controller
 	void SetPosition(DirectX::XMFLOAT3 pos);
 
