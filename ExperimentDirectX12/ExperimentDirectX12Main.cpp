@@ -18,6 +18,8 @@ ExperimentDirectX12Main::ExperimentDirectX12Main()
 	m_timer.SetFixedTimeStep(true);
 	m_timer.SetTargetElapsedSeconds(1.0 / 60);
 	*/
+	m_moveLookController = ref new MoveLookController();
+	m_moveLookController->Initialize(CoreWindow::GetForCurrentThread());
 }
 
 // Creates and initializes the renderers.
@@ -36,6 +38,7 @@ void ExperimentDirectX12Main::Update()
 	m_timer.Tick([&]()
 	{
 		// TODO: Replace this with your app's content update functions.
+		m_moveLookController->Update(CoreWindow::GetForCurrentThread());
 		m_sceneRenderer->Update(m_timer);
 	});
 }

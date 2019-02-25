@@ -26,7 +26,7 @@ namespace ExperimentDirectX12
 		std::unique_ptr<Sample3DSceneRenderer> m_sceneRenderer;
 
 		// Controller for moving and rotating the camera
-		std::unique_ptr<MoveLookController> m_moveLookController;
+		MoveLookController^ m_moveLookController;
 
 		// Rendering loop timer.
 		DX::StepTimer m_timer;
