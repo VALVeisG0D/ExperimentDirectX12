@@ -174,6 +174,7 @@ inline void Field::RemoveParticle(int yCoordinate, int xCoordinate, int zCoordin
 
 inline void Field::UpdateParticlePosition()
 {
+	int inertiaDiff = 0;
 	// 3 steps: calculate inertia, delete old position, add new position
 	for (size_t i = 0; i < DEFAULT_NUMBER_OF_PARTICLES; ++i)
 	{
@@ -181,109 +182,109 @@ inline void Field::UpdateParticlePosition()
 		//	x-o-o
 		//	o-o-o
 		//	o-o-x
-		int tempInertiaDiag = 
+		inertiaDiff = 
 			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate - 1] - 
 			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate + 1];
 
-		particleList[i].xInertia += tempInertiaDiag;
-		particleList[i].yInertia -= tempInertiaDiag;
-		particleList[i].zInertia += tempInertiaDiag;
+		particleList[i].xInertia += inertiaDiff;
+		particleList[i].yInertia -= inertiaDiff;
+		particleList[i].zInertia += inertiaDiff;
 
 		//	x-o-o
 		//	o-o-o
 		//	o-o-x
-		tempInertiaDiag =
+		inertiaDiff =
 			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate + 1] -
 			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate - 1];
 
-		particleList[i].xInertia += tempInertiaDiag;
-		particleList[i].yInertia -= tempInertiaDiag;
-		particleList[i].zInertia -= tempInertiaDiag;
+		particleList[i].xInertia += inertiaDiff;
+		particleList[i].yInertia -= inertiaDiff;
+		particleList[i].zInertia -= inertiaDiff;
 
 		//	o-o-x
 		//	o-o-o
 		//	x-o-o
-		tempInertiaDiag =
+		inertiaDiff =
 			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate + 1] -
 			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate - 1];
 
-		particleList[i].xInertia += tempInertiaDiag;
-		particleList[i].yInertia += tempInertiaDiag;
-		particleList[i].zInertia -= tempInertiaDiag;
+		particleList[i].xInertia += inertiaDiff;
+		particleList[i].yInertia += inertiaDiff;
+		particleList[i].zInertia -= inertiaDiff;
 
 		//	o-o-x
 		//	o-o-o
 		//	x-o-o
-		tempInertiaDiag =
+		inertiaDiff =
 			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate - 1] -
 			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate + 1];
 
-		particleList[i].xInertia += tempInertiaDiag;
-		particleList[i].yInertia += tempInertiaDiag;
-		particleList[i].zInertia += tempInertiaDiag;
+		particleList[i].xInertia += inertiaDiff;
+		particleList[i].yInertia += inertiaDiff;
+		particleList[i].zInertia += inertiaDiff;
 
 		//	Calculating the inertia on the edge of the particle on the XZ plane
 		//	o-o-o
 		//	x-o-x
 		//	o-o-o
-		tempInertiaDiag =
+		inertiaDiff =
 			field[particleList[i].yCoordinate][particleList[i].xCoordinate - 1][particleList[i].zCoordinate - 1] -
 			field[particleList[i].yCoordinate][particleList[i].xCoordinate + 1][particleList[i].zCoordinate + 1];
 
-		particleList[i].xInertia += tempInertiaDiag;
-		particleList[i].zInertia += tempInertiaDiag;
+		particleList[i].xInertia += inertiaDiff;
+		particleList[i].zInertia += inertiaDiff;
 
 		//	o-o-o
 		//	x-o-x
 		//	o-o-o
-		tempInertiaDiag =
+		inertiaDiff =
 			field[particleList[i].yCoordinate][particleList[i].xCoordinate - 1][particleList[i].zCoordinate + 1] -
 			field[particleList[i].yCoordinate][particleList[i].xCoordinate + 1][particleList[i].zCoordinate - 1];
 
-		particleList[i].xInertia += tempInertiaDiag;
-		particleList[i].zInertia -= tempInertiaDiag;
+		particleList[i].xInertia += inertiaDiff;
+		particleList[i].zInertia -= inertiaDiff;
 
 		//	Calculating inertia on the edge of the particle on the YZ plane
 		//	o-x-o
 		//	o-o-o
 		//	o-x-o
-		tempInertiaDiag =
+		inertiaDiff =
 			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate][particleList[i].zCoordinate + 1] -
 			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate][particleList[i].zCoordinate - 1];
 
-		particleList[i].yInertia += tempInertiaDiag;
-		particleList[i].zInertia -= tempInertiaDiag;
+		particleList[i].yInertia += inertiaDiff;
+		particleList[i].zInertia -= inertiaDiff;
 
 		//	o-x-o
 		//	o-o-o
 		//	o-x-o
-		tempInertiaDiag =
+		inertiaDiff =
 			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate][particleList[i].zCoordinate - 1] -
 			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate][particleList[i].zCoordinate + 1];
 
-		particleList[i].yInertia += tempInertiaDiag;
-		particleList[i].zInertia += tempInertiaDiag;
+		particleList[i].yInertia += inertiaDiff;
+		particleList[i].zInertia += inertiaDiff;
 
 		//	Calculating the inertias on the edge of the particle on the XY plane
 		//	x-o-o
 		//	o-o-o
 		//	o-o-x
-		tempInertiaDiag =
+		inertiaDiff =
 			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate] -
 			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate];
 
-		particleList[i].xInertia += tempInertiaDiag;
-		particleList[i].yInertia -= tempInertiaDiag;
+		particleList[i].xInertia += inertiaDiff;
+		particleList[i].yInertia -= inertiaDiff;
 
 		//	o-o-x
 		//	o-o-o
 		//	x-o-o
-		tempInertiaDiag =
+		inertiaDiff =
 			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate] -
 			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate];
 
-		particleList[i].xInertia += tempInertiaDiag;
-		particleList[i].yInertia += tempInertiaDiag;	
+		particleList[i].xInertia += inertiaDiff;
+		particleList[i].yInertia += inertiaDiff;	
 
 		//	Calculating the center x-inertia
 		//	o-o-o
