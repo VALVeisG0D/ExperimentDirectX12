@@ -174,7 +174,9 @@ inline void Field::RemoveParticle(int yCoordinate, int xCoordinate, int zCoordin
 
 inline void Field::UpdateParticlePosition()
 {
+	// Stores the difference in inertia between opposing points on the particle
 	int inertiaDiff = 0;
+
 	// 3 steps: calculate inertia, delete old position, add new position
 	for (size_t i = 0; i < DEFAULT_NUMBER_OF_PARTICLES; ++i)
 	{
