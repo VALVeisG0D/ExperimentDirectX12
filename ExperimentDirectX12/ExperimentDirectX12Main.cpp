@@ -39,7 +39,7 @@ void ExperimentDirectX12Main::Update()
 	{
 		// TODO: Replace this with your app's content update functions.
 		m_moveLookController->Update(CoreWindow::GetForCurrentThread());
-		m_sceneRenderer->Update(m_timer);
+		m_sceneRenderer->Update(m_timer, m_moveLookController);
 	});
 }
 

@@ -271,7 +271,7 @@ void Sample3DSceneRenderer::CreateWindowSizeDependentResources()
 }
 
 // Called once per frame, rotates the cube and calculates the model and view matrices.
-void Sample3DSceneRenderer::Update(DX::StepTimer const& timer)
+void Sample3DSceneRenderer::Update(DX::StepTimer const& timer, const MoveLookController^ moveLookController)
 {
 	if (m_loadingComplete)
 	{
