@@ -271,7 +271,7 @@ void Sample3DSceneRenderer::CreateWindowSizeDependentResources()
 }
 
 // Called once per frame, rotates the cube and calculates the model and view matrices.
-void Sample3DSceneRenderer::Update(DX::StepTimer const& timer, const MoveLookController^ moveLookController)
+void Sample3DSceneRenderer::Update(DX::StepTimer const& timer, MoveLookController^ moveLookController)
 {
 	if (m_loadingComplete)
 	{
@@ -304,6 +304,8 @@ void Sample3DSceneRenderer::Update(DX::StepTimer const& timer, const MoveLookCon
 			//MC Always wait when uploading to GPU
 			m_deviceResources->WaitForGpu();
 		}
+		DirectX::XMFLOAT3 txfm = moveLookController->get_Position();
+		XMStoreFloat4x4(&m_constantBufferData.view, XMMatrixTranspose(XMMatrixLookAtRH(moveLookController->get_Position(), moveLookController->get_LookPoint(), XMVECTORF32{ 0.0f, 1.0f, 0.0f, 0.0f }));
 
 		// Update the constant buffer resource.
 		UINT8* destination = m_mappedConstantBuffer + (m_deviceResources->GetCurrentFrameIndex() * c_alignedConstantBufferSize);

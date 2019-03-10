@@ -15,7 +15,7 @@ namespace ExperimentDirectX12
 		~Sample3DSceneRenderer();
 		void CreateDeviceDependentResources();
 		void CreateWindowSizeDependentResources();
-		void Update(DX::StepTimer const& timer, const MoveLookController^ moveLookController);
+		void Update(DX::StepTimer const& timer, MoveLookController^ moveLookController);
 		void UpdateVertexBuffer(UINT dataBufferSize, VertexPositionColor *data, Microsoft::WRL::ComPtr<ID3D12Resource> &dataBufferUpload);
 		bool Render();
 
