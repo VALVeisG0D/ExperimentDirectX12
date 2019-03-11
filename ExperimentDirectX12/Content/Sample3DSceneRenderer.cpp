@@ -304,8 +304,14 @@ void Sample3DSceneRenderer::Update(DX::StepTimer const& timer, MoveLookControlle
 			//MC Always wait when uploading to GPU
 			m_deviceResources->WaitForGpu();
 		}
-		DirectX::XMFLOAT3 txfm = moveLookController->get_Position();
-		XMStoreFloat4x4(&m_constantBufferData.view, XMMatrixTranspose(XMMatrixLookAtRH(moveLookController->get_Position(), moveLookController->get_LookPoint(), XMVECTORF32{ 0.0f, 1.0f, 0.0f, 0.0f }));
+
+		DirectX::XMFLOAT3 tempXMFloatPosition = moveLookController->get_Position();
+		DirectX::XMFLOAT3 tempXMFloatLook = moveLookController->get_LookPoint();
+		
+		XMStoreFloat4x4(&m_constantBufferData.view, 
+			XMMatrixTranspose(XMMatrixLookAtRH(XMVECTORF32{ tempXMFloatPosition.x, tempXMFloatPosition.y, tempXMFloatPosition.z, 0.0f }, 
+				XMVECTORF32{ tempXMFloatLook.x, tempXMFloatLook.y, tempXMFloatLook.z, 0.0f },
+			XMVECTORF32{ 0.0f, 1.0f, 0.0f, 0.0f })));
 
 		// Update the constant buffer resource.
 		UINT8* destination = m_mappedConstantBuffer + (m_deviceResources->GetCurrentFrameIndex() * c_alignedConstantBufferSize);
