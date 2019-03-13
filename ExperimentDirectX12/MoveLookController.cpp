@@ -206,8 +206,8 @@ void MoveLookController::Update(CoreWindow ^ window)
 	// Rotate command to align with our direction (world coordinates).
 	DirectX::XMFLOAT3 wCommand;
 	wCommand.x = command.x * cosf(m_yaw) - command.y * sinf(m_yaw);
-	wCommand.y = command.x * sinf(m_pitch) + command.y * cosf(m_pitch);
-	wCommand.z = command.z;
+	wCommand.y = command.x * sinf(m_yaw) + command.y * cosf(m_yaw) - command.z * sinf(m_pitch);
+	wCommand.z = command.y * sinf(m_yaw) + command.z * cosf(m_pitch);//command.z;
 
 	// Scale for sensitivity adjustment.
 	wCommand.x = wCommand.x * MOVEMENT_GAIN;
