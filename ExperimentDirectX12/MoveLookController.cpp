@@ -53,20 +53,26 @@ void MoveLookController::OnPointerMoved(CoreWindow ^ sender, PointerEventArgs ^ 
 		m_movePointerPosition = position;	// Save the current position.
 	else if (pointerID == m_lookPointerID)	// This is the look pointer.
 	{
-		// Look control
-		DirectX::XMFLOAT2 pointerDelta;
-		pointerDelta.x = position.x - m_lookLastPoint.x;	// How far did pointer move
-		pointerDelta.y = position.y - m_lookLastPoint.y;
+		//// Look control
+		//DirectX::XMFLOAT2 pointerDelta;
+		//pointerDelta.x = position.x - m_lookLastPoint.x;	// How far did pointer move
+		//pointerDelta.y = position.y - m_lookLastPoint.y;
 
-		DirectX::XMFLOAT2 rotationDelta;
-		rotationDelta.x = pointerDelta.x * ROTATION_GAIN;	// Scale for control sensitivity.
-		rotationDelta.y = pointerDelta.y * ROTATION_GAIN;
+		//DirectX::XMFLOAT2 rotationDelta;
+		//rotationDelta.x = pointerDelta.x * ROTATION_GAIN;	// Scale for control sensitivity.
+		//rotationDelta.y = pointerDelta.y * ROTATION_GAIN;
 
-		m_lookLastPoint = position;							// Save for the next time through.
+		//m_lookLastPoint = position;							// Save for the next time through.
 
-		m_pitch -= rotationDelta.y;			// Update our orientation based on the command.
-		m_yaw -= rotationDelta.x;			// Mouse y increases down, but pitch increases up.
-											// Yaw is defined as CCW around the y-axis.
+		//m_pitch -= rotationDelta.y;			// Update our orientation based on the command.
+		//m_yaw -= rotationDelta.x;			// Mouse y increases down, but pitch increases up.
+		//									// Yaw is defined as CCW around the y-axis.
+
+
+		m_pitch -= (position.y - m_lookLastPoint.y) * ROTATION_GAIN;
+		m_yaw -= (position.x - m_lookLastPoint.x) * ROTATION_GAIN;
+
+		m_lookLastPoint = position;
 
 		// Limit the pitch to straight up or straight down.
 		m_pitch = (float)__max(-DirectX::XM_PI / 2.0f, m_pitch);
