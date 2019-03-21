@@ -305,9 +305,11 @@ void Sample3DSceneRenderer::Update(DX::StepTimer const& timer, MoveLookControlle
 			m_deviceResources->WaitForGpu();
 		}
 
+		// Temps to store camera movement info for next frame
 		DirectX::XMFLOAT3 tempXMFloatPosition = moveLookController->get_Position();
 		DirectX::XMFLOAT3 tempXMFloatLook = moveLookController->get_LookPoint();
 		
+		// Updating the view matrix with user input
 		XMStoreFloat4x4(&m_constantBufferData.view, 
 			XMMatrixTranspose(XMMatrixLookAtRH(XMVECTORF32{ tempXMFloatPosition.x, tempXMFloatPosition.y, tempXMFloatPosition.z, 0.0f }, 
 				XMVECTORF32{ tempXMFloatLook.x, tempXMFloatLook.y, tempXMFloatLook.z, 0.0f },
