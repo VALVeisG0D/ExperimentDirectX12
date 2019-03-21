@@ -156,7 +156,7 @@ void MoveLookController::Update(CoreWindow ^ window)
 		DirectX::XMFLOAT2 pointerDelta(m_movePointerPosition);
 		pointerDelta.x -= m_moveFirstDown.x;
 		pointerDelta.y -= m_moveFirstDown.y;
-		
+
 		// Figure out the command from the touch-based virtual joystick.
 		if (pointerDelta.x > 16.0f)		// Leave 32 pixel-wide dead spot for being still.
 			m_moveCommand.x = 1.0f;
@@ -215,11 +215,35 @@ void MoveLookController::Update(CoreWindow ^ window)
 	Velocity.z = wCommand.y;
 	Velocity.y = wCommand.z;
 
-	// Integrate
-	m_position.x += Velocity.x;
-	m_position.y += Velocity.y;
-	m_position.z += Velocity.z;
+	DirectX::XMFLOAT3 tempLookPoint = get_LookPoint();
+	tempLookPoint.x += m_moveCommand.x;
+	tempLookPoint.y += m_moveCommand.z;
+	tempLookPoint.z += m_moveCommand.y;
+	vector = DirectX::XMLoadFloat3(&tempLookPoint);
 
+	if (fabsf(tempLookPoint.x) > 0.1f || fabsf(tempLookPoint.y) > 0.1f || fabsf(tempLookPoint.z) > 0.1f)
+	{
+		vector = DirectX::XMVector3Normalize(vector);
+		DirectX::XMStoreFloat3(&tempLookPoint, vector);
+	}
+
+	wCommand = tempLookPoint;
+	wCommand.x *= MOVEMENT_GAIN;
+	wCommand.y *= MOVEMENT_GAIN;
+	wCommand.z *= MOVEMENT_GAIN;
+
+	Velocity.x = -wCommand.x;
+	Velocity.z = wCommand.y;
+	Velocity.y = wCommand.z;
+
+	if (m_forward || m_back)
+	{
+
+		// Integrate
+		m_position.x += Velocity.x;
+		m_position.y += Velocity.y;
+		m_position.z += Velocity.z;
+	}
 	// Clear movement input accumulator for use during the next frame.
 	m_moveCommand = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 }
