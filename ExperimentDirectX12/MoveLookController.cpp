@@ -215,35 +215,19 @@ void MoveLookController::Update(CoreWindow ^ window)
 	Velocity.z = wCommand.y;
 	Velocity.y = wCommand.z;
 
-	DirectX::XMFLOAT3 tempLookPoint = get_LookPoint();
-	tempLookPoint.x += m_moveCommand.x;
-	tempLookPoint.y += m_moveCommand.z;
-	tempLookPoint.z += m_moveCommand.y;
-	vector = DirectX::XMLoadFloat3(&tempLookPoint);
+	DirectX::XMFLOAT3 tempXMFloatPosition = get_Position();
+	DirectX::XMFLOAT3 tempXMFloatLook = get_LookPoint();
 
-	if (fabsf(tempLookPoint.x) > 0.1f || fabsf(tempLookPoint.y) > 0.1f || fabsf(tempLookPoint.z) > 0.1f)
-	{
-		vector = DirectX::XMVector3Normalize(vector);
-		DirectX::XMStoreFloat3(&tempLookPoint, vector);
-	}
+	// Updating the view matrix with user input
+	DirectX::XMMatrixLookAtRH(DirectX::XMVECTORF32{ tempXMFloatPosition.x, tempXMFloatPosition.y, tempXMFloatPosition.z, 0.0f },
+			DirectX::XMVECTORF32{ tempXMFloatLook.x, tempXMFloatLook.y, tempXMFloatLook.z, 0.0f },
+			DirectX::XMVECTORF32{ 0.0f, 1.0f, 0.0f, 0.0f });
 
-	wCommand = tempLookPoint;
-	wCommand.x *= MOVEMENT_GAIN;
-	wCommand.y *= MOVEMENT_GAIN;
-	wCommand.z *= MOVEMENT_GAIN;
+	// Integrate
+	m_position.x += Velocity.x;
+	m_position.y += Velocity.y;
+	m_position.z += Velocity.z;
 
-	Velocity.x = -wCommand.x;
-	Velocity.z = wCommand.y;
-	Velocity.y = wCommand.z;
-
-	if (m_forward || m_back)
-	{
-
-		// Integrate
-		m_position.x += Velocity.x;
-		m_position.y += Velocity.y;
-		m_position.z += Velocity.z;
-	}
 	// Clear movement input accumulator for use during the next frame.
 	m_moveCommand = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 }
