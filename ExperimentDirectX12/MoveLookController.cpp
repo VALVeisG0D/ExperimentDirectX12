@@ -99,6 +99,10 @@ void MoveLookController::OnKeyDown(CoreWindow ^ sender, KeyEventArgs ^ args)
 		m_left = true;
 	if (Key == VirtualKey::D)	// Right
 		m_right = true;
+	if (Key == VirtualKey::Space)	// Up
+		m_up = true;
+	if (Key == VirtualKey::Control)	// Down
+		m_down = true;
 }
 
 void MoveLookController::OnKeyUp(CoreWindow ^ sender, KeyEventArgs ^ args)
@@ -115,6 +119,10 @@ void MoveLookController::OnKeyUp(CoreWindow ^ sender, KeyEventArgs ^ args)
 		m_left = false;
 	if (Key == VirtualKey::D)	// Right
 		m_right = false;
+	if (Key == VirtualKey::Space)	// Up
+		m_up = false;
+	if (Key == VirtualKey::Control)	// Down
+		m_down = false;
 }
 
 void MoveLookController::Initialize(CoreWindow ^ window)
@@ -201,7 +209,7 @@ void MoveLookController::Update(CoreWindow ^ window)
 	DirectX::XMFLOAT3 wCommand;
 	wCommand.x = command.x * cosf(m_yaw) - command.y * sinf(m_yaw);
 	wCommand.y = command.x * sinf(m_yaw) + command.y * cosf(m_yaw);
-	wCommand.z = command.z;
+	wCommand.z = command.z * cosf(m_pitch) + command.y * sinf(m_pitch);
 
 	// Scale for sensitivity adjustment.
 	wCommand.x = wCommand.x * MOVEMENT_GAIN;
@@ -214,14 +222,6 @@ void MoveLookController::Update(CoreWindow ^ window)
 	Velocity.x = -wCommand.x;
 	Velocity.z = wCommand.y;
 	Velocity.y = wCommand.z;
-
-	DirectX::XMFLOAT3 tempXMFloatPosition = get_Position();
-	DirectX::XMFLOAT3 tempXMFloatLook = get_LookPoint();
-
-	// Updating the view matrix with user input
-	DirectX::XMMatrixLookAtRH(DirectX::XMVECTORF32{ tempXMFloatPosition.x, tempXMFloatPosition.y, tempXMFloatPosition.z, 0.0f },
-			DirectX::XMVECTORF32{ tempXMFloatLook.x, tempXMFloatLook.y, tempXMFloatLook.z, 0.0f },
-			DirectX::XMVECTORF32{ 0.0f, 1.0f, 0.0f, 0.0f });
 
 	// Integrate
 	m_position.x += Velocity.x;
