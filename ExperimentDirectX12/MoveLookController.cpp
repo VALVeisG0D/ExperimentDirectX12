@@ -38,6 +38,20 @@ void MoveLookController::OnPointerPressed(CoreWindow ^ sender, PointerEventArgs 
 			m_lookPointerID = args->CurrentPoint->PointerId;	// store the id of pointer using this control
 			m_lookLastDelta.x = m_lookLastDelta.y = 0;			// these are for smoothing
 			m_lookInUse = true;
+
+			static bool pointerCaptured = false;
+
+			pointerCaptured = !pointerCaptured;
+
+			if (pointerCaptured)
+				sender->SetPointerCapture();
+			else
+			{
+				sender->ReleasePointerCapture();
+				m_lookPointerID = 0;
+			}
+			
+			m_lookInUse = false;
 		}
 	}
 }
@@ -70,19 +84,19 @@ void MoveLookController::OnPointerMoved(CoreWindow ^ sender, PointerEventArgs ^ 
 
 void MoveLookController::OnPointerReleased(CoreWindow ^ sender, PointerEventArgs ^ args)
 {
-	unsigned pointerID = args->CurrentPoint->PointerId;
-	DirectX::XMFLOAT2 position = DirectX::XMFLOAT2(args->CurrentPoint->Position.X, args->CurrentPoint->Position.Y);
+	//unsigned pointerID = args->CurrentPoint->PointerId;
+	//DirectX::XMFLOAT2 position = DirectX::XMFLOAT2(args->CurrentPoint->Position.X, args->CurrentPoint->Position.Y);
 
-	if (pointerID == m_movePointerID)	// This was the move pointer.
-	{
-		m_moveInUse = false;
-		m_movePointerID = 0;
-	}
-	else if (pointerID == m_lookPointerID)	// This was the look pointer.
-	{
-		m_lookInUse = false;
-		m_lookPointerID = 0;
-	}
+	//if (pointerID == m_movePointerID)	// This was the move pointer.
+	//{
+	//	m_moveInUse = false;
+	//	m_movePointerID = 0;
+	//}
+	//else if (pointerID == m_lookPointerID)	// This was the look pointer.
+	//{
+	//	m_lookInUse = false;
+	//	m_lookPointerID = 0;
+	//}
 }
 
 void MoveLookController::OnKeyDown(CoreWindow ^ sender, KeyEventArgs ^ args)
