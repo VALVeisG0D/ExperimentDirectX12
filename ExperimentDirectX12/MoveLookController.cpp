@@ -143,14 +143,41 @@ void MoveLookController::OnKeyUp(CoreWindow ^ sender, KeyEventArgs ^ args)
 		m_down = false;
 }
 
+void MoveLookController::OnMouseMoved(MouseDevice ^ mouseDevice, MouseEventArgs ^ args)
+{
+	DirectX::XMFLOAT2 pointerDelta;
+	pointerDelta.x = static_cast<float>(args->MouseDelta.X);
+	pointerDelta.y = static_cast<float>(args->MouseDelta.Y);
+
+	// Scale for control sensitivity
+	DirectX::XMFLOAT2 rotationDelta;
+	rotationDelta.x = pointerDelta.x * ROTATION_GAIN;
+	rotationDelta.y = pointerDelta.y * ROTATION_GAIN;
+
+	// Update our orientation based on the command
+	m_pitch -= rotationDelta.y;	// Mouse y increases down, but pitch increases up
+	m_yaw -= rotationDelta.x;	// Yaw defined as CCW around y-axis
+
+	// Limit pitch to straight up or straight down
+	float limit = (float)(DirectX::XM_PI / 2) - 0.01f;
+	m_pitch = (float)__max(-limit, m_pitch);
+	m_pitch = (float)__min(+limit, m_pitch);
+
+	// Keep longitudinal in useful range by wrapping
+	if (m_yaw > DirectX::XM_PI)
+		m_yaw -= (float)DirectX::XM_PI * 2;
+	else if (m_yaw < -DirectX::XM_PI)
+		m_yaw += (float)DirectX::XM_PI * 2;
+}
+
 void MoveLookController::Initialize(CoreWindow ^ window)
 {
 	// Opt in to receive touch/mouse events.
 	window->PointerPressed +=
 		ref new TypedEventHandler<CoreWindow^, PointerEventArgs^>(this, &MoveLookController::OnPointerPressed);
 
-	window->PointerMoved +=
-		ref new TypedEventHandler<CoreWindow^, PointerEventArgs^>(this, &MoveLookController::OnPointerMoved);
+	//window->PointerMoved +=
+	//	ref new TypedEventHandler<CoreWindow^, PointerEventArgs^>(this, &MoveLookController::OnPointerMoved);
 
 	window->PointerReleased +=
 		ref new TypedEventHandler<CoreWindow^, PointerEventArgs^>(this, &MoveLookController::OnPointerReleased);
@@ -160,6 +187,9 @@ void MoveLookController::Initialize(CoreWindow ^ window)
 
 	window->KeyUp +=
 		ref new TypedEventHandler<CoreWindow^, KeyEventArgs^>(this, &MoveLookController::OnKeyUp);
+
+	MouseDevice::GetForCurrentView()->MouseMoved +=
+		ref new TypedEventHandler<MouseDevice^, MouseEventArgs^>(this, &MoveLookController::OnMouseMoved);
 
 	// Initialize the state of the controller
 	m_moveInUse = false;			// No pointer is in the Move control.

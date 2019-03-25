@@ -39,6 +39,7 @@ public:
 	void OnPointerReleased(CoreWindow^ sender, PointerEventArgs^ args);
 	void OnKeyDown(CoreWindow^ sender, KeyEventArgs^ args);
 	void OnKeyUp(CoreWindow^ sender, KeyEventArgs^ args);
+	void OnMouseMoved(MouseDevice^ mouseDevice, MouseEventArgs^ args);
 
 	// Set up the Controls that this controller supports
 	void Initialize(CoreWindow^ window);
