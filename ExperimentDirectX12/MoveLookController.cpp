@@ -44,11 +44,15 @@ void MoveLookController::OnPointerPressed(CoreWindow ^ sender, PointerEventArgs 
 			pointerCaptured = !pointerCaptured;
 
 			if (pointerCaptured)
+			{
 				sender->SetPointerCapture();
+				sender->PointerCursor = nullptr;
+			}
 			else
 			{
 				sender->ReleasePointerCapture();
 				m_lookPointerID = 0;
+				sender->PointerCursor = ref new CoreCursor(CoreCursorType::Arrow, 0);
 			}
 			
 			m_lookInUse = false;
