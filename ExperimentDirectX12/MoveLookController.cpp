@@ -219,6 +219,16 @@ void MoveLookController::Update(CoreWindow ^ window)
 				m_moveCommand.y = 1.0f;
 	}
 
+	DirectX::XMFLOAT3 tempLookAt = get_LookPoint();
+	DirectX::XMVECTOR vectorPosition = DirectX::XMLoadFloat3(&m_position);
+	DirectX::XMVECTOR vectorLookAt = DirectX::XMLoadFloat3(&tempLookAt);
+
+	// Pole our state bits that are set by the keyboard input events.
+	
+
+
+
+
 	// Pole our state bits that are set by the keyboard input events.
 	if (m_forward)
 		m_moveCommand.y += 1.0f;

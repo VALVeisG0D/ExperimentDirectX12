@@ -1,3 +1,7 @@
+//Use XMVECTOR for global variables and XMFLOAT2, XMFLOAT3, XMFLOAT4 for class members
+//	Difference between these two are that XMVECTOR needs to be 16-byte aligned for local
+//	and global variables. XMVECTORS also use SIMD hardware, so more performant.
+
 #pragma once
 #include <DirectXMath.h>
 
