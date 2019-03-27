@@ -2,6 +2,8 @@
 #include "MoveLookController.h"	// Putting definitions in a different .cpp file allows it to be compiled and linked SEPERATELY,
 								// thus preventing any conflicts due to violation of the ONE DEFINITION RULE
 
+using namespace DirectX;
+
 void MoveLookController::OnPointerPressed(CoreWindow ^ sender, PointerEventArgs ^ args)
 {
 	// Get the current pointer position.
@@ -222,15 +224,30 @@ void MoveLookController::Update(CoreWindow ^ window)
 	DirectX::XMFLOAT3 tempLookAt = get_LookPoint();
 	DirectX::XMVECTOR vectorPosition = DirectX::XMLoadFloat3(&m_position);
 	DirectX::XMVECTOR vectorLookAt = DirectX::XMLoadFloat3(&tempLookAt);
-
-	// Pole our state bits that are set by the keyboard input events.
 	
-
-
-
+	DirectX::XMVECTOR w = XMVector3Normalize(vectorLookAt - vectorPosition);
+	XMVECTORF32 up = { 0.0f, 1.0f, 0.0f, 0.0f };
+	XMVECTOR u = XMVector3Normalize(XMVector3Cross(up, w));
+	XMVECTOR v = XMVector3Cross(w, u);
 
 	// Pole our state bits that are set by the keyboard input events.
 	if (m_forward)
+		XMStoreFloat3(&m_position, vectorPosition + (w * MOVEMENT_GAIN));
+	if (m_back)
+		XMStoreFloat3(&m_position, vectorPosition + (w * -MOVEMENT_GAIN));
+
+	if (m_left)
+		XMStoreFloat3(&m_position, vectorPosition + (u * MOVEMENT_GAIN));
+	if (m_right)
+		XMStoreFloat3(&m_position, vectorPosition + (u * -MOVEMENT_GAIN));
+
+	if (m_up)
+		XMStoreFloat3(&m_position, vectorPosition + (v * MOVEMENT_GAIN));
+	if (m_down)
+		XMStoreFloat3(&m_position, vectorPosition + (v * -MOVEMENT_GAIN));
+
+	// Pole our state bits that are set by the keyboard input events.
+	/*if (m_forward)
 		m_moveCommand.y += 1.0f;
 	if (m_back)
 		m_moveCommand.y -= 1.0f;
@@ -239,12 +256,12 @@ void MoveLookController::Update(CoreWindow ^ window)
 		m_moveCommand.x -= 1.0f;
 	if (m_right)
 		m_moveCommand.x += 1.0f;
-
+		
 	if (m_up)
 		m_moveCommand.z += 1.0f;
 	if (m_down)
 		m_moveCommand.z -= 1.0f;
-
+		
 	// Make sure that 45 degree cases are not faster.
 	DirectX::XMFLOAT3 command = m_moveCommand;
 	DirectX::XMVECTOR vector = DirectX::XMLoadFloat3(&command);
@@ -277,7 +294,7 @@ void MoveLookController::Update(CoreWindow ^ window)
 	m_position.x += Velocity.x;
 	m_position.y += Velocity.y;
 	m_position.z += Velocity.z;
-
+	*/
 	// Clear movement input accumulator for use during the next frame.
 	m_moveCommand = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 }
