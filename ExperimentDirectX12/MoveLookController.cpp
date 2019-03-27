@@ -232,21 +232,21 @@ void MoveLookController::Update(CoreWindow ^ window)
 
 	// Pole our state bits that are set by the keyboard input events.
 	if (m_forward)
-		XMStoreFloat3(&m_position, vectorPosition + (w * MOVEMENT_GAIN));
+		vectorPosition += w * MOVEMENT_GAIN;
 	if (m_back)
-		XMStoreFloat3(&m_position, vectorPosition + (w * -MOVEMENT_GAIN));
+		vectorPosition += w * -MOVEMENT_GAIN;
 
 	if (m_left)
-		XMStoreFloat3(&m_position, vectorPosition + (u * MOVEMENT_GAIN));
+		vectorPosition += u * MOVEMENT_GAIN;
 	if (m_right)
-		XMStoreFloat3(&m_position, vectorPosition + (u * -MOVEMENT_GAIN));
+		vectorPosition += u * -MOVEMENT_GAIN;
 
 	if (m_up)
-		XMStoreFloat3(&m_position, vectorPosition + (v * MOVEMENT_GAIN));
+		vectorPosition += v * MOVEMENT_GAIN;
 	if (m_down)
-		XMStoreFloat3(&m_position, vectorPosition + (v * -MOVEMENT_GAIN));
+		vectorPosition += v * -MOVEMENT_GAIN;
 
-	// Pole our state bits that are set by the keyboard input events.
+	XMStoreFloat3(&m_position, vectorPosition);
 	/*if (m_forward)
 		m_moveCommand.y += 1.0f;
 	if (m_back)
