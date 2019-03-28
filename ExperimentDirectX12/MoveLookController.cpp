@@ -211,9 +211,8 @@ void MoveLookController::Update(CoreWindow ^ window)
 
 	XMFLOAT3 tempCameraLookAt = get_LookPoint();
 	XMVECTOR vectorCameraPosition = XMLoadFloat3(&m_position);
-	XMVECTOR vectorCameraLookAt = XMLoadFloat3(&tempCameraLookAt);
 	
-	XMVECTOR w = XMVector3Normalize(vectorCameraLookAt - vectorCameraPosition);
+	XMVECTOR w = XMVector3Normalize(XMLoadFloat3(&tempCameraLookAt) - vectorCameraPosition);
 	XMVECTOR u = XMVector3Normalize(XMVector3Cross({ 0.0f, 1.0f, 0.0f, 0.0f }, w));
 	XMVECTOR v = XMVector3Cross(w, u);
 
