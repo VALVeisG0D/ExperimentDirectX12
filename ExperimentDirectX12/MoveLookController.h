@@ -5,6 +5,7 @@
 #pragma once
 #include <DirectXMath.h>
 
+using namespace DirectX;
 using namespace Windows::UI::Core;
 using namespace Windows::System;
 using namespace Windows::Foundation;
@@ -16,21 +17,21 @@ constexpr auto MOVEMENT_GAIN = 0.1f;		// Sensitivity adjustment for the move con
 ref class MoveLookController
 {
 	// Properties of the controller object
-	DirectX::XMFLOAT3 m_position;		// The position of the controller
+	XMFLOAT3 m_position;		// The position of the controller
 	float m_pitch, m_yaw;				// Orientation euler angles in radians
 
 	// Properties of the move controller
 	bool m_moveInUse;					// Specifies whether the move control is in use
 	unsigned m_movePointerID;			// ID of pointer in this control
-	DirectX::XMFLOAT2 m_moveFirstDown;	// Point where initial contact occured
-	DirectX::XMFLOAT2 m_movePointerPosition;	// Point where the move pointer is currently located
-	DirectX::XMFLOAT3 m_moveCommand;	// The net command from the move control
+	XMFLOAT2 m_moveFirstDown;	// Point where initial contact occured
+	XMFLOAT2 m_movePointerPosition;	// Point where the move pointer is currently located
+	XMFLOAT3 m_moveCommand;	// The net command from the move control
 
 	// Properties of the move control
 	bool m_lookInUse;					// Specifies whether the look control is in use
 	unsigned m_lookPointerID;			// ID of the pointer in this control
-	DirectX::XMFLOAT2 m_lookLastPoint;	// Last point (from last frame)
-	DirectX::XMFLOAT2 m_lookLastDelta;	// For smoothing
+	XMFLOAT2 m_lookLastPoint;	// Last point (from last frame)
+	XMFLOAT2 m_lookLastDelta;	// For smoothing
 
 	bool m_forward, m_back;				// States for movement
 	bool m_left, m_right;
@@ -51,14 +52,14 @@ public:
 
 internal:
 	// Accessor to set position of controller
-	void SetPosition(DirectX::XMFLOAT3 pos);
+	void SetPosition(XMFLOAT3 pos);
 
 	// Accessor to set orientation of controller
 	void SetOrientation(float pitch, float yaw);
 
 	// Returns the position of the controller object
-	DirectX::XMFLOAT3 get_Position();
+	XMFLOAT3 get_Position();
 
 	// Returns the point which the controller is facing
-	DirectX::XMFLOAT3 get_LookPoint();
+	XMFLOAT3 get_LookPoint();
 };

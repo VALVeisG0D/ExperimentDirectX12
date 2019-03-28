@@ -2,13 +2,13 @@
 #include "MoveLookController.h"	// Putting definitions in a different .cpp file allows it to be compiled and linked SEPERATELY,
 								// thus preventing any conflicts due to violation of the ONE DEFINITION RULE
 
-using namespace DirectX;
+//using namespace DirectX;
 
 void MoveLookController::OnPointerPressed(CoreWindow ^ sender, PointerEventArgs ^ args)
 {
 	// Get the current pointer position.
 	unsigned pointerID = args->CurrentPoint->PointerId;
-	DirectX::XMFLOAT2 position = DirectX::XMFLOAT2(args->CurrentPoint->Position.X, args->CurrentPoint->Position.Y);
+	XMFLOAT2 position = XMFLOAT2(args->CurrentPoint->Position.X, args->CurrentPoint->Position.Y);
 
 	auto device = args->CurrentPoint->PointerDevice;
 	auto deviceType = device->PointerDeviceType;
@@ -54,7 +54,7 @@ void MoveLookController::OnPointerPressed(CoreWindow ^ sender, PointerEventArgs 
 void MoveLookController::OnPointerMoved(CoreWindow ^ sender, PointerEventArgs ^ args)
 {
 	unsigned pointerID = args->CurrentPoint->PointerId;
-	DirectX::XMFLOAT2 position = DirectX::XMFLOAT2(args->CurrentPoint->Position.X, args->CurrentPoint->Position.Y);
+	XMFLOAT2 position = XMFLOAT2(args->CurrentPoint->Position.X, args->CurrentPoint->Position.Y);
 
 	// Decide which control this pointer is operating.
 	if (pointerID == m_movePointerID)		// This is the move pointer.
@@ -72,8 +72,8 @@ void MoveLookController::OnPointerMoved(CoreWindow ^ sender, PointerEventArgs ^ 
 		m_lookLastPoint = position;	// Save for the next time through
 
 		// Limit the pitch to straight up or straight down.
-		m_pitch = (float)__max(-DirectX::XM_PI / 2.0f, m_pitch);
-		m_pitch = (float)__min(+DirectX::XM_PI / 2.0f, m_pitch);
+		m_pitch = (float)__max(-XM_PI / 2.0f, m_pitch);
+		m_pitch = (float)__min(+XM_PI / 2.0f, m_pitch);
 	}
 }
 
@@ -138,12 +138,12 @@ void MoveLookController::OnMouseMoved(MouseDevice ^ mouseDevice, MouseEventArgs 
 {
 	if (m_lookInUse)
 	{
-		DirectX::XMFLOAT2 pointerDelta;
+		XMFLOAT2 pointerDelta;
 		pointerDelta.x = static_cast<float>(args->MouseDelta.X);
 		pointerDelta.y = static_cast<float>(args->MouseDelta.Y);
 
 		// Scale for control sensitivity
-		DirectX::XMFLOAT2 rotationDelta;
+		XMFLOAT2 rotationDelta;
 		rotationDelta.x = pointerDelta.x * ROTATION_GAIN;
 		rotationDelta.y = pointerDelta.y * ROTATION_GAIN;
 
@@ -152,15 +152,15 @@ void MoveLookController::OnMouseMoved(MouseDevice ^ mouseDevice, MouseEventArgs 
 		m_yaw -= rotationDelta.x;	// Yaw defined as CCW around y-axis
 
 		// Limit pitch to straight up or straight down
-		float limit = (float)(DirectX::XM_PI / 2) - 0.01f;
+		float limit = (float)(XM_PI / 2) - 0.01f;
 		m_pitch = (float)__max(-limit, m_pitch);
 		m_pitch = (float)__min(+limit, m_pitch);
 
 		// Keep longitudinal in useful range by wrapping
-		if (m_yaw > DirectX::XM_PI)
+		if (m_yaw > XM_PI)
 			m_yaw -= (float)DirectX::XM_PI * 2;
-		else if (m_yaw < -DirectX::XM_PI)
-			m_yaw += (float)DirectX::XM_PI * 2;
+		else if (m_yaw < -XM_PI)
+			m_yaw += (float)XM_PI * 2;
 	}
 }
 
@@ -193,7 +193,7 @@ void MoveLookController::Initialize(CoreWindow ^ window)
 	m_lookPointerID = 0;
 
 	// Need to init this as it is reset every frame.
-	m_moveCommand = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_moveCommand = XMFLOAT3(0.0f, 0.0f, 0.0f);
 
 	SetOrientation(0, 0);			// Look straight ahead when the app starts.
 }
@@ -221,11 +221,11 @@ void MoveLookController::Update(CoreWindow ^ window)
 				m_moveCommand.y = 1.0f;
 	}
 
-	DirectX::XMFLOAT3 tempLookAt = get_LookPoint();
-	DirectX::XMVECTOR vectorPosition = DirectX::XMLoadFloat3(&m_position);
-	DirectX::XMVECTOR vectorLookAt = DirectX::XMLoadFloat3(&tempLookAt);
+	XMFLOAT3 tempLookAt = get_LookPoint();
+	XMVECTOR vectorPosition = XMLoadFloat3(&m_position);
+	XMVECTOR vectorLookAt = XMLoadFloat3(&tempLookAt);
 	
-	DirectX::XMVECTOR w = XMVector3Normalize(vectorLookAt - vectorPosition);
+	XMVECTOR w = XMVector3Normalize(vectorLookAt - vectorPosition);
 	XMVECTORF32 up = { 0.0f, 1.0f, 0.0f, 0.0f };
 	XMVECTOR u = XMVector3Normalize(XMVector3Cross(up, w));
 	XMVECTOR v = XMVector3Cross(w, u);
@@ -296,10 +296,10 @@ void MoveLookController::Update(CoreWindow ^ window)
 	m_position.z += Velocity.z;
 	*/
 	// Clear movement input accumulator for use during the next frame.
-	m_moveCommand = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_moveCommand = XMFLOAT3(0.0f, 0.0f, 0.0f);
 }
 
-void MoveLookController::SetPosition(DirectX::XMFLOAT3 pos)
+void MoveLookController::SetPosition(XMFLOAT3 pos)
 {
 	m_position = pos;
 }
@@ -323,7 +323,7 @@ DirectX::XMFLOAT3 MoveLookController::get_LookPoint()
 	float r = cosf(m_pitch);			// In the plane
 	float z = r * cosf(m_yaw);			// Fwd-back
 	float x = r * sinf(m_yaw);			// Left-right
-	DirectX::XMFLOAT3 result(x, y, z);
+	XMFLOAT3 result(x, y, z);
 	result.x += m_position.x;
 	result.y += m_position.y;
 	result.z += m_position.z;
