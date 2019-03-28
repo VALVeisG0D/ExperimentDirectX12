@@ -36,15 +36,14 @@ void MoveLookController::OnPointerPressed(CoreWindow ^ sender, PointerEventArgs 
 		{
 			m_lookLastPoint = position;		// save the point for later move
 			m_lookPointerID = args->CurrentPoint->PointerId;	// store the id of pointer using this control
-			m_lookLastDelta.x = m_lookLastDelta.y = 0;			// these are for smoothing
 			m_lookInUse = true;
-			sender->PointerCursor = nullptr;		
+			sender->PointerCursor = nullptr;	// Hide the cursor
 		}
 		else
 		{
 			m_lookPointerID = 0;
 			m_lookInUse = false;
-			sender->PointerCursor = ref new CoreCursor(CoreCursorType::Arrow, 0);
+			sender->PointerCursor = ref new CoreCursor(CoreCursorType::Arrow, 0);	// Show the cursor
 		}
 	}
 }
@@ -136,18 +135,9 @@ void MoveLookController::OnMouseMoved(MouseDevice ^ mouseDevice, MouseEventArgs 
 {
 	if (m_lookInUse)
 	{
-		XMFLOAT2 pointerDelta;
-		pointerDelta.x = static_cast<float>(args->MouseDelta.X);
-		pointerDelta.y = static_cast<float>(args->MouseDelta.Y);
-
-		// Scale for control sensitivity
-		XMFLOAT2 rotationDelta;
-		rotationDelta.x = pointerDelta.x * ROTATION_GAIN;
-		rotationDelta.y = pointerDelta.y * ROTATION_GAIN;
-
-		// Update our orientation based on the command
-		m_pitch -= rotationDelta.y;	// Mouse y increases down, but pitch increases up
-		m_yaw -= rotationDelta.x;	// Yaw defined as CCW around y-axis
+		// Scale for control sensitivity and update our orientation based on the command
+		m_pitch -= static_cast<float>(args->MouseDelta.Y) * ROTATION_GAIN;	// Mouse y increases down, but pitch increases up
+		m_yaw -= static_cast<float>(args->MouseDelta.X) * ROTATION_GAIN;	// Yaw defined as CCW around y-axis
 
 		// Limit pitch to straight up or straight down
 		float limit = (float)(XM_PI / 2) - 0.01f;
@@ -245,54 +235,7 @@ void MoveLookController::Update(CoreWindow ^ window)
 		vectorPosition += v * -MOVEMENT_GAIN;
 
 	XMStoreFloat3(&m_position, vectorPosition);
-	/*if (m_forward)
-		m_moveCommand.y += 1.0f;
-	if (m_back)
-		m_moveCommand.y -= 1.0f;
-
-	if (m_left)
-		m_moveCommand.x -= 1.0f;
-	if (m_right)
-		m_moveCommand.x += 1.0f;
-		
-	if (m_up)
-		m_moveCommand.z += 1.0f;
-	if (m_down)
-		m_moveCommand.z -= 1.0f;
-		
-	// Make sure that 45 degree cases are not faster.
-	DirectX::XMFLOAT3 command = m_moveCommand;
-	DirectX::XMVECTOR vector = DirectX::XMLoadFloat3(&command);
-
-	if (fabsf(command.x) > 0.1f || fabsf(command.y) > 0.1f || fabsf(command.z) > 0.1f)
-	{
-		vector = DirectX::XMVector3Normalize(vector);
-		DirectX::XMStoreFloat3(&command, vector);
-	}
-
-	// Rotate command to align with our direction (world coordinates).
-	DirectX::XMFLOAT3 wCommand;
-	wCommand.x = command.x * cosf(m_yaw) - command.y * sinf(m_yaw);
-	wCommand.y = command.x * sinf(m_yaw) + command.y * cosf(m_yaw);
-	wCommand.z = command.z * cosf(m_pitch) + command.y * sinf(m_pitch);
-
-	// Scale for sensitivity adjustment.
-	wCommand.x = wCommand.x * MOVEMENT_GAIN;
-	wCommand.y = wCommand.y * MOVEMENT_GAIN;
-	wCommand.z = wCommand.z * MOVEMENT_GAIN;
-
-	// Our velocity is based on the command.
-	// Also note that y is the up-down axis.
-	DirectX::XMFLOAT3 Velocity;
-	Velocity.x = -wCommand.x;
-	Velocity.z = wCommand.y;
-	Velocity.y = wCommand.z;
-
-	// Integrate
-	m_position.x += Velocity.x;
-	m_position.y += Velocity.y;
-	m_position.z += Velocity.z;
-	*/
+	
 	// Clear movement input accumulator for use during the next frame.
 	m_moveCommand = XMFLOAT3(0.0f, 0.0f, 0.0f);
 }

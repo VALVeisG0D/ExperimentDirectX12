@@ -31,7 +31,6 @@ ref class MoveLookController
 	bool m_lookInUse;					// Specifies whether the look control is in use
 	unsigned m_lookPointerID;			// ID of the pointer in this control
 	XMFLOAT2 m_lookLastPoint;	// Last point (from last frame)
-	XMFLOAT2 m_lookLastDelta;	// For smoothing
 
 	bool m_forward, m_back;				// States for movement
 	bool m_left, m_right;
