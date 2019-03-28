@@ -146,7 +146,7 @@ void MoveLookController::OnMouseMoved(MouseDevice ^ mouseDevice, MouseEventArgs 
 
 		// Keep longitudinal in useful range by wrapping
 		if (m_yaw > XM_PI)
-			m_yaw -= (float)DirectX::XM_PI * 2;
+			m_yaw -= (float)XM_PI * 2;
 		else if (m_yaw < -XM_PI)
 			m_yaw += (float)XM_PI * 2;
 	}
