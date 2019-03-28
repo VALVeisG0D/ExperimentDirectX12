@@ -209,32 +209,31 @@ void MoveLookController::Update(CoreWindow ^ window)
 				m_moveCommand.y = 1.0f;
 	}
 
-	XMFLOAT3 tempLookAt = get_LookPoint();
-	XMVECTOR vectorPosition = XMLoadFloat3(&m_position);
-	XMVECTOR vectorLookAt = XMLoadFloat3(&tempLookAt);
+	XMFLOAT3 tempCameraLookAt = get_LookPoint();
+	XMVECTOR vectorCameraPosition = XMLoadFloat3(&m_position);
+	XMVECTOR vectorCameraLookAt = XMLoadFloat3(&tempCameraLookAt);
 	
-	XMVECTOR w = XMVector3Normalize(vectorLookAt - vectorPosition);
-	XMVECTORF32 up = { 0.0f, 1.0f, 0.0f, 0.0f };
-	XMVECTOR u = XMVector3Normalize(XMVector3Cross(up, w));
+	XMVECTOR w = XMVector3Normalize(vectorCameraLookAt - vectorCameraPosition);
+	XMVECTOR u = XMVector3Normalize(XMVector3Cross({ 0.0f, 1.0f, 0.0f, 0.0f }, w));
 	XMVECTOR v = XMVector3Cross(w, u);
 
 	// Pole our state bits that are set by the keyboard input events.
 	if (m_forward)
-		vectorPosition += w * MOVEMENT_GAIN;
+		vectorCameraPosition += w * MOVEMENT_GAIN;
 	if (m_back)
-		vectorPosition += w * -MOVEMENT_GAIN;
+		vectorCameraPosition += w * -MOVEMENT_GAIN;
 
 	if (m_left)
-		vectorPosition += u * MOVEMENT_GAIN;
+		vectorCameraPosition += u * MOVEMENT_GAIN;
 	if (m_right)
-		vectorPosition += u * -MOVEMENT_GAIN;
+		vectorCameraPosition += u * -MOVEMENT_GAIN;
 
 	if (m_up)
-		vectorPosition += v * MOVEMENT_GAIN;
+		vectorCameraPosition += v * MOVEMENT_GAIN;
 	if (m_down)
-		vectorPosition += v * -MOVEMENT_GAIN;
+		vectorCameraPosition += v * -MOVEMENT_GAIN;
 
-	XMStoreFloat3(&m_position, vectorPosition);
+	XMStoreFloat3(&m_position, vectorCameraPosition);
 	
 	// Clear movement input accumulator for use during the next frame.
 	m_moveCommand = XMFLOAT3(0.0f, 0.0f, 0.0f);
