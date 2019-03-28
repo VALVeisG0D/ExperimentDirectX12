@@ -2,8 +2,6 @@
 #include "MoveLookController.h"	// Putting definitions in a different .cpp file allows it to be compiled and linked SEPERATELY,
 								// thus preventing any conflicts due to violation of the ONE DEFINITION RULE
 
-//using namespace DirectX;
-
 void MoveLookController::OnPointerPressed(CoreWindow ^ sender, PointerEventArgs ^ args)
 {
 	// Get the current pointer position.
