@@ -209,14 +209,17 @@ void MoveLookController::Update(CoreWindow ^ window)
 				m_moveCommand.y = 1.0f;
 	}
 
+	// Load camera position and camera point of aim into temporary variables.
 	XMFLOAT3 tempCameraLookAt = get_LookPoint();
 	XMVECTOR vectorCameraPosition = XMLoadFloat3(&m_position);
 	
+	// Unit vectors that make up the view matrix.
 	XMVECTOR w = XMVector3Normalize(XMLoadFloat3(&tempCameraLookAt) - vectorCameraPosition);
 	XMVECTOR u = XMVector3Normalize(XMVector3Cross({ 0.0f, 1.0f, 0.0f, 0.0f }, w));
 	XMVECTOR v = XMVector3Cross(w, u);
 
 	// Pole our state bits that are set by the keyboard input events.
+	// Accumulate changes into camera position vector.
 	if (m_forward)
 		vectorCameraPosition += w * MOVEMENT_GAIN;
 	if (m_back)
