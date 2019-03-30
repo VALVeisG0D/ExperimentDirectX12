@@ -1,4 +1,10 @@
-﻿#include "pch.h"
+﻿//Use XMVECTOR for global variables and XMFLOAT2, XMFLOAT3, XMFLOAT4 for class members
+//	Difference between these two are that XMVECTOR needs to be 16-byte aligned for local
+//	and global variables. XMVECTORS also use SIMD hardware, so more performant.
+//Putting definitions in a different .cpp file allows it to be compiled and linked SEPERATELY,
+//	thus preventing any conflicts due to violation of the ONE DEFINITION RULE
+
+#include "pch.h"
 #include "Sample3DSceneRenderer.h"
 #include "Field.h"
 
