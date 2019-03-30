@@ -3,6 +3,7 @@
 //	and global variables. XMVECTORS also use SIMD hardware, so more performant.
 //Putting definitions in a different .cpp file allows it to be compiled and linked SEPERATELY,
 //	thus preventing any conflicts due to violation of the ONE DEFINITION RULE
+//Enable a compute shader by using a compute pipeline state description
 
 #include "pch.h"
 #include "Sample3DSceneRenderer.h"
@@ -104,7 +105,12 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		state.DSVFormat = m_deviceResources->GetDepthBufferFormat();
 		state.SampleDesc.Count = 1;
 
-		DX::ThrowIfFailed(m_deviceResources->GetD3DDevice()->CreateGraphicsPipelineState(&state, IID_PPV_ARGS(&m_pipelineState)));		
+		D3D12_COMPUTE_PIPELINE_STATE_DESC particleInteractionComputePSO = {};
+		particleInteractionComputePSO.pRootSignature = m_computeRootSignature.Get();
+		particleInteractionComputePSO.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+
+		DX::ThrowIfFailed(m_deviceResources->GetD3DDevice()->CreateGraphicsPipelineState(&state, IID_PPV_ARGS(&m_pipelineState)));
+		//DX::ThrowIfFailed(m_deviceResources->GetD3DDevice()->CreateComputePipelineState(&particleInteractionComputePSO, IID_PPV_ARGS(&m_computePipelineState)));
 
 		// Shader data can be deleted once the pipeline state is created.
 		m_vertexShader.clear();
