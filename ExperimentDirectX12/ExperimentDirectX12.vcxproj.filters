@@ -77,11 +77,20 @@
       <Filter>Content</Filter>
     </ClInclude>
     <ClInclude Include="MoveLookController.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ExperimentDirectX12_TemporaryKey.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ExperimentDirectX12.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="ParticleInteractionComputeShader.hlsl">
+      <Filter>Content</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
