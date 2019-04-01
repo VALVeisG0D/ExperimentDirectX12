@@ -1,10 +1,19 @@
-cbuffer ParticleInteractionConstantBuffer : register(b0)
+struct Particle
 {
-	float f = 0.0f;
+	float Position;
+	float Velocity;
 };
+
+ConsumeStructuredBuffer<Particle> gInput;
+AppendStructuredBuffer<Particle> gOutput;
 
 [numthreads(1, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {
-	//f = f + 1.0f;
+	Particle p = gInput.Consume();
+
+	p.Position += 1.0f;
+	p.Velocity += 2.0f;
+
+	gOutput.Append(p);
 }
