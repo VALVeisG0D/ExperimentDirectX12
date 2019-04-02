@@ -181,6 +181,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
             NAME_D3D12_OBJECT(m_cbvHeap);
 		}
 
+		// Create the constant buffer resource
 		CD3DX12_RESOURCE_DESC constantBufferDesc = CD3DX12_RESOURCE_DESC::Buffer(DX::c_frameCount * c_alignedConstantBufferSize);
 		DX::ThrowIfFailed(d3dDevice->CreateCommittedResource(
 			&uploadHeapProperties,
