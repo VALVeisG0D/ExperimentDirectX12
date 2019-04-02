@@ -4,7 +4,8 @@
 //Putting definitions in a different .cpp file allows it to be compiled and linked SEPERATELY,
 //	thus preventing any conflicts due to violation of the ONE DEFINITION RULE
 //Enable a compute shader by using a compute pipeline state description
-//1. Resource. 2. Descriptor heaps. 3. Views
+//1. Resource/Buffers. 2. Descriptor heaps. 3. Views/Descriptors
+//Root signature->
 
 #include "pch.h"
 #include "Sample3DSceneRenderer.h"
