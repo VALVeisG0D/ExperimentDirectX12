@@ -96,7 +96,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 	});
 
 	// Create the pipeline state once the shaders are loaded.
-	auto createPipelineStateTask = (createPSTask && createVSTask).then([this]() {
+	auto createPipelineStateTask = (createCSTask && createPSTask && createVSTask).then([this]() {
 
 		static const D3D12_INPUT_ELEMENT_DESC instanceInputLayout[] =
 		{
@@ -121,14 +121,16 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 
 		D3D12_COMPUTE_PIPELINE_STATE_DESC particleInteractionComputePSO = {};
 		particleInteractionComputePSO.pRootSignature = m_computeRootSignature.Get();
+		particleInteractionComputePSO.CS = CD3DX12_SHADER_BYTECODE(&m_computeShader[0], m_computeShader.size());
 		particleInteractionComputePSO.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 
 		DX::ThrowIfFailed(m_deviceResources->GetD3DDevice()->CreateGraphicsPipelineState(&state, IID_PPV_ARGS(&m_pipelineState)));
-		//DX::ThrowIfFailed(m_deviceResources->GetD3DDevice()->CreateComputePipelineState(&particleInteractionComputePSO, IID_PPV_ARGS(&m_computePipelineState)));
+		DX::ThrowIfFailed(m_deviceResources->GetD3DDevice()->CreateComputePipelineState(&particleInteractionComputePSO, IID_PPV_ARGS(&m_computePipelineState)));
 
 		// Shader data can be deleted once the pipeline state is created.
 		m_vertexShader.clear();
 		m_pixelShader.clear();
+		m_computeShader.clear();
 	});
 
 	// Create and upload cube geometry resources to the GPU.
