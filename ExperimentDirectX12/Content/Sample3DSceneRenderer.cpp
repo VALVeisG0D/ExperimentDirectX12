@@ -73,11 +73,14 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		DX::ThrowIfFailed(d3dDevice->CreateRootSignature(0, pSignature->GetBufferPointer(), pSignature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)));
         NAME_D3D12_OBJECT(m_rootSignature);
 
-		// Root signature for particle compute shader
-		parameter.InitAsUnorderedAccessView(0);
-		descRootSignature.Init(1, &parameter, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_NONE);
+		CD3DX12_ROOT_PARAMETER parameter2;
+		CD3DX12_ROOT_SIGNATURE_DESC descRootSignature2;
 
-		DX::ThrowIfFailed(D3D12SerializeRootSignature(&descRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, pSignature.GetAddressOf(), pError.GetAddressOf()));
+		// Root signature for particle compute shader
+		parameter2.InitAsUnorderedAccessView(0);
+		descRootSignature2.Init(1, &parameter2, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_NONE);
+
+		DX::ThrowIfFailed(D3D12SerializeRootSignature(&descRootSignature2, D3D_ROOT_SIGNATURE_VERSION_1, pSignature.GetAddressOf(), pError.GetAddressOf()));
 		DX::ThrowIfFailed(d3dDevice->CreateRootSignature(0, pSignature->GetBufferPointer(), pSignature->GetBufferSize(), IID_PPV_ARGS(&m_computeRootSignature)));
 		NAME_D3D12_OBJECT(m_computeRootSignature);
 	}
