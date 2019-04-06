@@ -7,7 +7,7 @@ struct Particle
 ConsumeStructuredBuffer<Particle> gInput;
 AppendStructuredBuffer<Particle> gOutput;
 
-[numthreads(1, 1, 1)]
+[numthreads(32, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {
 	Particle p = gInput.Consume();
