@@ -249,6 +249,42 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		m_deviceResources->WaitForGpu();
 	});
 
+	// Create buffer resources for particle interaction compute shader
+	auto createComputeBufferTask = createAssetsTask.then([this]() {
+		auto d3dDevice = m_deviceResources->GetD3DDevice();
+
+		// Create a descriptor heap for the unordered access buffers
+		{
+			D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
+			heapDesc.NumDescriptors = DX::c_frameCount;
+			heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+			heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+			DX::ThrowIfFailed(d3dDevice->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_uavHeap)));
+			NAME_D3D12_OBJECT(m_uavHeap);
+		}
+
+		struct Particle
+		{
+			float Velocity;
+			float Particle;
+		};
+
+		std::vector<Particle> datap(6);
+		CD3DX12_HEAP_PROPERTIES upload(D3D12_HEAP_TYPE_UPLOAD);
+
+		// Create the UAV buffer resource
+		CD3DX12_RESOURCE_DESC uavBufferDesc = CD3DX12_RESOURCE_DESC::Buffer(6 * sizeof(Particle), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+		DX::ThrowIfFailed(d3dDevice->CreateCommittedResource(
+			&upload,
+			D3D12_HEAP_FLAG_NONE,
+			&uavBufferDesc,
+			D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+			nullptr,
+			IID_PPV_ARGS(&m_uavBuffer)));
+
+		NAME_D3D12_OBJECT(m_uavBuffer);
+		});
+
 	createAssetsTask.then([this]() {
 		m_loadingComplete = true;	
 	});	
