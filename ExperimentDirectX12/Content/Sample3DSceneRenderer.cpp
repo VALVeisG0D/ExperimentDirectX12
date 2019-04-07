@@ -5,7 +5,7 @@
 //	thus preventing any conflicts due to violation of the ONE DEFINITION RULE
 //Enable a compute shader by using a compute pipeline state description
 //1. Resource/Buffers. 2. Descriptor heaps. 3. Views/Descriptors
-//Root signature->
+//Shader/Root Signature/Pipeline/Descriptors/Resources
 
 #include "pch.h"
 #include "Sample3DSceneRenderer.h"
@@ -74,8 +74,10 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
         NAME_D3D12_OBJECT(m_rootSignature);
 
 		// Root signature for particle compute shader
-		parameter.InitAsUnorderedAccessView(0);
-		descRootSignature.Init(1, &parameter, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_NONE);
+		// UAV with counters (for buffers like Consumed and Append Structured buffers) must be bound to descriptor tables.
+		range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 2);
+		parameter.InitAsDescriptorTable(1, &range);
+		descRootSignature.Init(1, &parameter);
 
 		DX::ThrowIfFailed(D3D12SerializeRootSignature(&descRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, pSignature.GetAddressOf(), pError.GetAddressOf()));
 		DX::ThrowIfFailed(d3dDevice->CreateRootSignature(0, pSignature->GetBufferPointer(), pSignature->GetBufferSize(), IID_PPV_ARGS(&m_computeRootSignature)));
