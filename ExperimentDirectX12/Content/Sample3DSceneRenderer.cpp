@@ -259,6 +259,11 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 	// 1. Create Descriptor heap. 2. Create buffers. 3. Create descriptors to buffers
 	//	and place it in descriptor heap
 	auto createComputeBufferTask = createAssetsTask.then([this]() {
+		// CreateDescriptorHeap
+		// CreateCommittedResource
+		// CreateUnorderedAccessView
+		// SetComputeRootDescriptorTable
+
 		auto d3dDevice = m_deviceResources->GetD3DDevice();
 
 		// Create a descriptor heap for the unordered access buffers
@@ -280,6 +285,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		std::vector<Particle> datap(6);
 		CD3DX12_HEAP_PROPERTIES upload(D3D12_HEAP_TYPE_UPLOAD);
 
+		// Is this a mappable resource?
 		// Create the UAV upload buffer resource. Created on CPU side.
 		// The space for the UAV counter is located at the end of the buffer. Therefore the offset is 6 * sizeof(Particle) to get to the counter.
 		CD3DX12_RESOURCE_DESC uavBufferDesc = CD3DX12_RESOURCE_DESC::Buffer((6 * sizeof(Particle)) + sizeof(UINT), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
