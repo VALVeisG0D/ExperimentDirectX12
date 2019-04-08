@@ -6,6 +6,12 @@
 //Enable a compute shader by using a compute pipeline state description
 //1. Resource/Buffers. 2. Descriptor heaps. 3. Views/Descriptors
 //Shader/Root Signature/Pipeline/Descriptors/Resources
+//Default heap: for GPU only. Upload heap: for uploading to GPU. Read back heap: for data to be
+//	read back to CPU
+//Mappable resource vs. non-mappable resource. Non-mappable is fast for GPU only, since CPU doesn't need to read
+//Resources are placed in heaps. Different resource types: Buffers, textures, etc.
+//Shader visibility is for staging, whatever that means (store descriptors before recording to command list)
+//	When shader is visible, heap size may have hardware size limit 
 
 #include "pch.h"
 #include "Sample3DSceneRenderer.h"
@@ -75,7 +81,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 
 		// Root signature for particle compute shader
 		// UAV with counters (for buffers like Consumed and Append Structured buffers) must be bound to descriptor tables.
-		range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 2);
+		range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
 		parameter.InitAsDescriptorTable(1, &range);
 		descRootSignature.Init(1, &parameter);
 
@@ -250,6 +256,8 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 	});
 
 	// Create buffer resources for particle interaction compute shader
+	// 1. Create Descriptor heap. 2. Create buffers. 3. Create descriptors to buffers
+	//	and place it in descriptor heap
 	auto createComputeBufferTask = createAssetsTask.then([this]() {
 		auto d3dDevice = m_deviceResources->GetD3DDevice();
 
@@ -265,27 +273,54 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 
 		struct Particle
 		{
+			float Position;
 			float Velocity;
-			float Particle;
 		};
 
 		std::vector<Particle> datap(6);
 		CD3DX12_HEAP_PROPERTIES upload(D3D12_HEAP_TYPE_UPLOAD);
 
-		// Create the UAV buffer resource
-		CD3DX12_RESOURCE_DESC uavBufferDesc = CD3DX12_RESOURCE_DESC::Buffer(6 * sizeof(Particle), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+		// Create the UAV upload buffer resource. Created on CPU side.
+		// The space for the UAV counter is located at the end of the buffer. Therefore the offset is 6 * sizeof(Particle) to get to the counter.
+		CD3DX12_RESOURCE_DESC uavBufferDesc = CD3DX12_RESOURCE_DESC::Buffer((6 * sizeof(Particle)) + sizeof(UINT), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 		DX::ThrowIfFailed(d3dDevice->CreateCommittedResource(
 			&upload,
 			D3D12_HEAP_FLAG_NONE,
 			&uavBufferDesc,
 			D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
 			nullptr,
-			IID_PPV_ARGS(&m_uavBuffer)));
+			IID_PPV_ARGS(&m_uavUploadBufferA)));
 
-		NAME_D3D12_OBJECT(m_uavBuffer);
+		NAME_D3D12_OBJECT(m_uavUploadBufferA);
+
+		// Create the UAV output buffer resource. Created on CPU side.
+		DX::ThrowIfFailed(d3dDevice->CreateCommittedResource(
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+			D3D12_HEAP_FLAG_NONE,
+			&uavBufferDesc,
+			D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+			nullptr,
+			IID_PPV_ARGS(&m_uavOutputBuffer)));
+
+		NAME_D3D12_OBJECT(m_uavOutputBuffer);
+
+		// The space for the UAV counter is located at the end of the buffer. Therefore the offset is 6 * sizeof(Particle) to get to the counter.
+		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+		uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+		uavDesc.Buffer.CounterOffsetInBytes = (6 * sizeof(Particle));
+		uavDesc.Buffer.FirstElement = 0;
+		uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+		uavDesc.Buffer.NumElements = 6;
+		uavDesc.Buffer.StructureByteStride = sizeof(Particle);
+
+		// Last parameter maybe for allowing offset to other UAV descriptor in the same heap?
+		// This function creates a UAV descriptor and places it in the CPU side descriptor heap
+		d3dDevice->CreateUnorderedAccessView(m_uavUploadBufferA.Get(), m_uavUploadBufferA.Get(), &uavDesc, m_uavHeap->GetCPUDescriptorHandleForHeapStart());
+		
 		});
 
-	createAssetsTask.then([this]() {
+	createComputeBufferTask.then([this]() {
 		m_loadingComplete = true;	
 	});	
 }
