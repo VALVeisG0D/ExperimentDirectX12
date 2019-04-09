@@ -11,7 +11,9 @@
 //Mappable resource vs. non-mappable resource. Non-mappable is fast for GPU only, since CPU doesn't need to read
 //Resources are placed in heaps. Different resource types: Buffers, textures, etc.
 //Shader visibility is for staging, whatever that means (store descriptors before recording to command list)
-//	When shader is visible, heap size may have hardware size limit 
+//	When shader is visible, heap size may have hardware size limit
+//Descriptors are needed to describe data to GPU.
+//CPU->(Upload buffer)->Map->(Mapped data)->memcpy->GPU.
 
 #include "pch.h"
 #include "Sample3DSceneRenderer.h"
@@ -193,6 +195,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		UpdateVertexBuffer(instanceBufferSize, instanceData, instanceBufferUpload);
 
 		// Create a descriptor heap for the constant buffers.
+		//MC: Want a constant buffer for each frame so that you don't wait/overwrite the one being rendered.
 		{
 			D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
 			heapDesc.NumDescriptors = DX::c_frameCount;
@@ -257,19 +260,19 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 
 	// Create buffer resources for particle interaction compute shader
 	// 1. Create Descriptor heap. 2. Create buffers. 3. Create descriptors to buffers
-	//	and place it in descriptor heap
+	//	and place it in descriptor heap. 4. Map the buffer.
 	auto createComputeBufferTask = createAssetsTask.then([this]() {
-		// CreateDescriptorHeap
-		// CreateCommittedResource
-		// CreateUnorderedAccessView
-		// SetComputeRootDescriptorTable
+		// CreateDescriptorHeap: discrete
+		// CreateCommittedResource: discrete
+		// CreateUnorderedAccessView: connects buffer to descriptor in heap
+		// SetComputeRootDescriptorTable: connects the root signature with the first descriptor in the heap
 
 		auto d3dDevice = m_deviceResources->GetD3DDevice();
 
 		// Create a descriptor heap for the unordered access buffers
 		{
 			D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
-			heapDesc.NumDescriptors = DX::c_frameCount;
+			heapDesc.NumDescriptors = DX::c_frameCount * 2U;
 			heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 			heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 			DX::ThrowIfFailed(d3dDevice->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_uavHeap)));
@@ -286,20 +289,20 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		CD3DX12_HEAP_PROPERTIES upload(D3D12_HEAP_TYPE_UPLOAD);
 
 		// Is this a mappable resource?
-		// Create the UAV upload buffer resource. Created on CPU side.
+		// Create the UAV upload buffer resource. Created on CPU side?
 		// The space for the UAV counter is located at the end of the buffer. Therefore the offset is 6 * sizeof(Particle) to get to the counter.
 		CD3DX12_RESOURCE_DESC uavBufferDesc = CD3DX12_RESOURCE_DESC::Buffer((6 * sizeof(Particle)) + sizeof(UINT), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 		DX::ThrowIfFailed(d3dDevice->CreateCommittedResource(
 			&upload,
 			D3D12_HEAP_FLAG_NONE,
 			&uavBufferDesc,
-			D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
 			nullptr,
 			IID_PPV_ARGS(&m_uavUploadBufferA)));
 
 		NAME_D3D12_OBJECT(m_uavUploadBufferA);
 
-		// Create the UAV output buffer resource. Created on CPU side.
+		// Create the UAV output buffer resource. Created on CPU side?
 		DX::ThrowIfFailed(d3dDevice->CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 			D3D12_HEAP_FLAG_NONE,
