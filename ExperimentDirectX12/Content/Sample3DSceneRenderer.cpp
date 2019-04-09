@@ -14,6 +14,8 @@
 //	When shader is visible, heap size may have hardware size limit
 //Descriptors are needed to describe data to GPU.
 //CPU->(Upload buffer)->Map->(Mapped data)->memcpy->GPU.
+//Descriptor types: SRV, CBV, UAV, Sampler etc.
+//Resources are not specified as SRV, CBV, UAV during creation.
 
 #include "pch.h"
 #include "Sample3DSceneRenderer.h"
@@ -289,9 +291,20 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		CD3DX12_HEAP_PROPERTIES upload(D3D12_HEAP_TYPE_UPLOAD);
 
 		// Is this a mappable resource?
-		// Create the UAV upload buffer resource. Created on CPU side?
+		// Create the UAV output buffer resource. Created on CPU side?
 		// The space for the UAV counter is located at the end of the buffer. Therefore the offset is 6 * sizeof(Particle) to get to the counter.
-		CD3DX12_RESOURCE_DESC uavBufferDesc = CD3DX12_RESOURCE_DESC::Buffer((6 * sizeof(Particle)) + sizeof(UINT), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+		CD3DX12_RESOURCE_DESC uavBufferDesc = CD3DX12_RESOURCE_DESC::Buffer((6 * sizeof(Particle)) + sizeof(UINT), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);	
+		DX::ThrowIfFailed(d3dDevice->CreateCommittedResource(
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+			D3D12_HEAP_FLAG_NONE,
+			&uavBufferDesc,
+			D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+			nullptr,
+			IID_PPV_ARGS(&m_uavOutputBuffer)));
+
+		NAME_D3D12_OBJECT(m_uavOutputBuffer);
+
+		// Create the UAV upload buffer resource. Created on CPU side?
 		DX::ThrowIfFailed(d3dDevice->CreateCommittedResource(
 			&upload,
 			D3D12_HEAP_FLAG_NONE,
@@ -302,16 +315,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 
 		NAME_D3D12_OBJECT(m_uavUploadBufferA);
 
-		// Create the UAV output buffer resource. Created on CPU side?
-		DX::ThrowIfFailed(d3dDevice->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-			D3D12_HEAP_FLAG_NONE,
-			&uavBufferDesc,
-			D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
-			nullptr,
-			IID_PPV_ARGS(&m_uavOutputBuffer)));
-
-		NAME_D3D12_OBJECT(m_uavOutputBuffer);
+		// Upload data here
 
 		// The space for the UAV counter is located at the end of the buffer. Therefore the offset is 6 * sizeof(Particle) to get to the counter.
 		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
@@ -325,7 +329,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 
 		// Last parameter maybe for allowing offset to other UAV descriptor in the same heap?
 		// This function creates a UAV descriptor and places it in the CPU side descriptor heap
-		d3dDevice->CreateUnorderedAccessView(m_uavUploadBufferA.Get(), m_uavUploadBufferA.Get(), &uavDesc, m_uavHeap->GetCPUDescriptorHandleForHeapStart());
+		d3dDevice->CreateUnorderedAccessView(m_uavOutputBuffer.Get(), m_uavOutputBuffer.Get(), &uavDesc, m_uavHeap->GetCPUDescriptorHandleForHeapStart());
 		
 		});
 
