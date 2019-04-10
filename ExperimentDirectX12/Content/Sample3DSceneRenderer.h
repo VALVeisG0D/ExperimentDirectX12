@@ -36,10 +36,11 @@ namespace ExperimentDirectX12
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>		m_uavHeap;
 		Microsoft::WRL::ComPtr<ID3D12Resource>				m_vertexBuffer;
 		Microsoft::WRL::ComPtr<ID3D12Resource>				m_instanceBuffer;
-		Microsoft::WRL::ComPtr<ID3D12Resource>				instanceBufferUpload;
+		Microsoft::WRL::ComPtr<ID3D12Resource>				m_instanceBufferUpload;
 		Microsoft::WRL::ComPtr<ID3D12Resource>				m_indexBuffer;
 		Microsoft::WRL::ComPtr<ID3D12Resource>				m_constantBuffer;
 		Microsoft::WRL::ComPtr<ID3D12Resource>				m_uavUploadBufferA;
+		Microsoft::WRL::ComPtr<ID3D12Resource>				m_uavInputBuffer;
 		Microsoft::WRL::ComPtr<ID3D12Resource>				m_uavOutputBuffer;
 		ModelViewProjectionConstantBuffer					m_constantBufferData;
 		UINT8*												m_mappedConstantBuffer;

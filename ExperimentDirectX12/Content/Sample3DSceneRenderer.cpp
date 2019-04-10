@@ -16,6 +16,13 @@
 //CPU->(Upload buffer)->Map->(Mapped data)->memcpy->GPU.
 //Descriptor types: SRV, CBV, UAV, Sampler etc.
 //Resources are not specified as SRV, CBV, UAV during creation.
+//CreateCommittedResource: creates both the resource and an implicit heap large enough to encompass the resource.
+//	The resource is mapped to the heap.
+//GPU resources are not bound directly. GPU resources are described to the GPU via descriptors. Why use descriptors?
+//	Because GPU resource is just a generic chunk of memory. They are generic so that they can be used at different
+//	stages of the rendering pipeline.
+//Descriptor heaps are the memory backing for descriptors.
+//Essentially, if a resource is described by a descriptor, it is ON THE GPU and being USED by it.
 
 #include "pch.h"
 #include "Sample3DSceneRenderer.h"
@@ -85,7 +92,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 
 		// Root signature for particle compute shader
 		// UAV with counters (for buffers like Consumed and Append Structured buffers) must be bound to descriptor tables.
-		range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
+		range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 2, 0);
 		parameter.InitAsDescriptorTable(1, &range);
 		descRootSignature.Init(1, &parameter);
 
@@ -171,7 +178,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 
 		// Create the instance buffer resource in the GPU's default heap and copy instance data into it using the upload heap.
 		// The upload resource must not be released until after the GPU has finished using it.
-		//Microsoft::WRL::ComPtr<ID3D12Resource> instanceBufferUpload;
+		//Microsoft::WRL::ComPtr<ID3D12Resource> m_instanceBufferUpload;
 
 		CD3DX12_RESOURCE_DESC instanceBufferDesc = CD3DX12_RESOURCE_DESC::Buffer(instanceBufferSize);
 		DX::ThrowIfFailed(d3dDevice->CreateCommittedResource(
@@ -189,12 +196,12 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 			&instanceBufferDesc,
 			D3D12_RESOURCE_STATE_GENERIC_READ,
 			nullptr,
-			IID_PPV_ARGS(&instanceBufferUpload)));
+			IID_PPV_ARGS(&m_instanceBufferUpload)));
 
 		NAME_D3D12_OBJECT(m_instanceBuffer);
 
 		// Upload the instance buffer to the GPU.
-		UpdateVertexBuffer(instanceBufferSize, instanceData, instanceBufferUpload);
+		UpdateVertexBuffer(instanceBufferSize, instanceData, m_instanceBufferUpload);
 
 		// Create a descriptor heap for the constant buffers.
 		//MC: Want a constant buffer for each frame so that you don't wait/overwrite the one being rendered.
@@ -266,10 +273,12 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 	auto createComputeBufferTask = createAssetsTask.then([this]() {
 		// CreateDescriptorHeap: discrete
 		// CreateCommittedResource: discrete
-		// CreateUnorderedAccessView: connects buffer to descriptor in heap
-		// SetComputeRootDescriptorTable: connects the root signature with the first descriptor in the heap
+		// CreateUnorderedAccessView: connects buffer to descriptor in heap, but still not connected to pipeline
+		// SetComputeRootDescriptorTable: connects the root signature with the first descriptor in the heap. Connects it to the pipeline
 
 		auto d3dDevice = m_deviceResources->GetD3DDevice();
+		DX::ThrowIfFailed(m_deviceResources->GetCommandAllocator()->Reset());
+		DX::ThrowIfFailed(m_commandList->Reset(m_deviceResources->GetCommandAllocator(), m_computePipelineState.Get()));
 
 		// Create a descriptor heap for the unordered access buffers
 		{
@@ -288,10 +297,9 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		};
 
 		std::vector<Particle> datap(6);
-		CD3DX12_HEAP_PROPERTIES upload(D3D12_HEAP_TYPE_UPLOAD);
 
 		// Is this a mappable resource?
-		// Create the UAV output buffer resource. Created on CPU side?
+		// Create the UAV output buffer resource. Will be bound to the GPU pipeline.
 		// The space for the UAV counter is located at the end of the buffer. Therefore the offset is 6 * sizeof(Particle) to get to the counter.
 		CD3DX12_RESOURCE_DESC uavBufferDesc = CD3DX12_RESOURCE_DESC::Buffer((6 * sizeof(Particle)) + sizeof(UINT), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);	
 		DX::ThrowIfFailed(d3dDevice->CreateCommittedResource(
@@ -304,24 +312,45 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 
 		NAME_D3D12_OBJECT(m_uavOutputBuffer);
 
-		// Create the UAV upload buffer resource. Created on CPU side?
+		// Create the UAV input buffer resource. Will be bound to the GPU pipeline.
 		DX::ThrowIfFailed(d3dDevice->CreateCommittedResource(
-			&upload,
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 			D3D12_HEAP_FLAG_NONE,
 			&uavBufferDesc,
+			D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+			nullptr,
+			IID_PPV_ARGS(&m_uavInputBuffer)));
+
+		NAME_D3D12_OBJECT(m_uavInputBuffer);
+
+		// Create the upload buffer resource. Created on CPU side?
+		DX::ThrowIfFailed(d3dDevice->CreateCommittedResource(
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+			D3D12_HEAP_FLAG_NONE,
+			&CD3DX12_RESOURCE_DESC::Buffer((6 * sizeof(Particle)) + sizeof(UINT)),
 			D3D12_RESOURCE_STATE_GENERIC_READ,
 			nullptr,
 			IID_PPV_ARGS(&m_uavUploadBufferA)));
 
 		NAME_D3D12_OBJECT(m_uavUploadBufferA);
 
-		// Upload data here
+		// Upload data from upload buffer to UAV input buffer
+		datap = { {0.0f, 1.0f}, {1.0f, 2.0f}, {2.0f, 3.0f}, {3.0f, 4.0f}, {4.0f, 5.0f}, {5.0f, 6.0f} };
+
+		D3D12_SUBRESOURCE_DATA uploadData = {};
+		uploadData.pData = reinterpret_cast<BYTE*>(&datap);
+		uploadData.RowPitch = sizeof(datap);
+		uploadData.SlicePitch = uploadData.RowPitch;
+
+		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST));
+		UpdateSubresources(m_commandList.Get(), m_uavInputBuffer.Get(), m_uavUploadBufferA.Get(), 0, 0, 1, &uploadData);
+		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
 
 		// The space for the UAV counter is located at the end of the buffer. Therefore the offset is 6 * sizeof(Particle) to get to the counter.
 		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 		uavDesc.Format = DXGI_FORMAT_UNKNOWN;
 		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
-		uavDesc.Buffer.CounterOffsetInBytes = (6 * sizeof(Particle));
+		uavDesc.Buffer.CounterOffsetInBytes = (6 * sizeof(Particle)); //ERROR
 		uavDesc.Buffer.FirstElement = 0;
 		uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
 		uavDesc.Buffer.NumElements = 6;
@@ -330,6 +359,14 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		// Last parameter maybe for allowing offset to other UAV descriptor in the same heap?
 		// This function creates a UAV descriptor and places it in the CPU side descriptor heap
 		d3dDevice->CreateUnorderedAccessView(m_uavOutputBuffer.Get(), m_uavOutputBuffer.Get(), &uavDesc, m_uavHeap->GetCPUDescriptorHandleForHeapStart());
+		d3dDevice->CreateUnorderedAccessView(m_uavInputBuffer.Get(), m_uavInputBuffer.Get(), &uavDesc, m_uavHeap->GetCPUDescriptorHandleForHeapStart());//ERROR 
+
+		// Close the command list and execute it.
+		DX::ThrowIfFailed(m_commandList->Close());
+		ID3D12CommandList* ppCommandList[] = { m_commandList.Get() };
+		m_deviceResources->GetCommandQueue()->ExecuteCommandLists(_countof(ppCommandList), ppCommandList);
+
+		m_deviceResources->WaitForGpu();
 		
 		});
 
@@ -408,7 +445,7 @@ void Sample3DSceneRenderer::Update(DX::StepTimer const& timer, MoveLookControlle
 			{ XMFLOAT3(field.xFieldIndexToCoordinate(5), field.yFieldIndexToCoordinate(5), field.zFieldIndexToCoordinate(5)), XMFLOAT3(1.0f, 0.75f, 0.79f) }
 			};
 
-			UpdateVertexBuffer(sizeof(instanceData), instanceData, instanceBufferUpload);
+			UpdateVertexBuffer(sizeof(instanceData), instanceData, m_instanceBufferUpload);
 
 			DX::ThrowIfFailed(m_commandList->Close());
 
