@@ -301,7 +301,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		// Is this a mappable resource?
 		// Create the UAV output buffer resource. Will be bound to the GPU pipeline.
 		// The space for the UAV counter is located at the end of the buffer. Therefore the offset is 6 * sizeof(Particle) to get to the counter.
-		CD3DX12_RESOURCE_DESC uavBufferDesc = CD3DX12_RESOURCE_DESC::Buffer((6 * sizeof(Particle)) + sizeof(UINT), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);	
+		CD3DX12_RESOURCE_DESC uavBufferDesc = CD3DX12_RESOURCE_DESC::Buffer((datap.size() * sizeof(Particle)) + sizeof(UINT), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);	
 		DX::ThrowIfFailed(d3dDevice->CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 			D3D12_HEAP_FLAG_NONE,
@@ -327,7 +327,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		DX::ThrowIfFailed(d3dDevice->CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 			D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer((6 * sizeof(Particle)) + sizeof(UINT)),
+			&CD3DX12_RESOURCE_DESC::Buffer((datap.size() * sizeof(Particle)) + sizeof(UINT)),
 			D3D12_RESOURCE_STATE_GENERIC_READ,
 			nullptr,
 			IID_PPV_ARGS(&m_uavUploadBufferA)));
@@ -350,7 +350,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 		uavDesc.Format = DXGI_FORMAT_UNKNOWN;
 		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
-		uavDesc.Buffer.CounterOffsetInBytes = (6 * sizeof(Particle)); //ERROR
+		uavDesc.Buffer.CounterOffsetInBytes = datap.size() * sizeof(Particle); //ERROR
 		uavDesc.Buffer.FirstElement = 0;
 		uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
 		uavDesc.Buffer.NumElements = 6;
