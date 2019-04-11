@@ -334,18 +334,6 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 
 		NAME_D3D12_OBJECT(m_uavUploadBufferA);
 
-		// Upload data from upload buffer to UAV input buffer
-		datap = { {0.0f, 1.0f}, {1.0f, 2.0f}, {2.0f, 3.0f}, {3.0f, 4.0f}, {4.0f, 5.0f}, {5.0f, 6.0f} };
-
-		D3D12_SUBRESOURCE_DATA uploadData = {};
-		uploadData.pData = reinterpret_cast<BYTE*>(&datap);
-		uploadData.RowPitch = sizeof(datap);
-		uploadData.SlicePitch = uploadData.RowPitch;
-
-		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST));
-		UpdateSubresources(m_commandList.Get(), m_uavInputBuffer.Get(), m_uavUploadBufferA.Get(), 0, 0, 1, &uploadData);
-		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
-
 		// The space for the UAV counter is located at the end of the buffer. Therefore the offset is 6 * sizeof(Particle) to get to the counter.
 		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 		uavDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -360,6 +348,19 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		// This function creates a UAV descriptor and places it in the CPU side descriptor heap
 		d3dDevice->CreateUnorderedAccessView(m_uavOutputBuffer.Get(), m_uavOutputBuffer.Get(), &uavDesc, m_uavHeap->GetCPUDescriptorHandleForHeapStart());
 		d3dDevice->CreateUnorderedAccessView(m_uavInputBuffer.Get(), m_uavInputBuffer.Get(), &uavDesc, m_uavHeap->GetCPUDescriptorHandleForHeapStart());//ERROR 
+
+
+		// Upload data from upload buffer to UAV input buffer
+		datap = { {0.0f, 1.0f}, {1.0f, 2.0f}, {2.0f, 3.0f}, {3.0f, 4.0f}, {4.0f, 5.0f}, {5.0f, 6.0f} };
+
+		D3D12_SUBRESOURCE_DATA uploadData = {};
+		uploadData.pData = reinterpret_cast<BYTE*>(&datap);
+		uploadData.RowPitch = sizeof(datap);
+		uploadData.SlicePitch = uploadData.RowPitch;
+
+		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST));
+		UpdateSubresources(m_commandList.Get(), m_uavInputBuffer.Get(), m_uavUploadBufferA.Get(), 0, 0, 1, &uploadData);
+		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
 
 		// Close the command list and execute it.
 		DX::ThrowIfFailed(m_commandList->Close());
