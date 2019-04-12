@@ -347,7 +347,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		// Last parameter maybe for allowing offset to other UAV descriptor in the same heap?
 		// This function creates a UAV descriptor and places it in the CPU side descriptor heap
 		d3dDevice->CreateUnorderedAccessView(m_uavOutputBuffer.Get(), m_uavOutputBuffer.Get(), &uavDesc, m_uavHeap->GetCPUDescriptorHandleForHeapStart());
-		d3dDevice->CreateUnorderedAccessView(m_uavInputBuffer.Get(), m_uavInputBuffer.Get(), &uavDesc, m_uavHeap->GetCPUDescriptorHandleForHeapStart());//ERROR 
+		//d3dDevice->CreateUnorderedAccessView(m_uavInputBuffer.Get(), m_uavInputBuffer.Get(), &uavDesc, m_uavHeap->GetCPUDescriptorHandleForHeapStart());//ERROR 
 
 
 		// Upload data from upload buffer to UAV input buffer
