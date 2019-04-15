@@ -33,7 +33,7 @@
 #include "..\Common\DirectXHelper.h"
 #include <ppltasks.h>
 #include <synchapi.h>
-
+#include <fstream>
 using namespace ExperimentDirectX12;
 
 using namespace Concurrency;
@@ -285,7 +285,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		// Create a descriptor heap for the unordered access buffers
 		{
 			D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
-			heapDesc.NumDescriptors = DX::c_frameCount * 2U;
+			heapDesc.NumDescriptors = 1U;
 			heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 			heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 			DX::ThrowIfFailed(d3dDevice->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_uavHeap)));
@@ -351,7 +351,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		// Last parameter maybe for allowing offset to other UAV descriptor in the same heap?
 		// This function creates a UAV descriptor and places it in the CPU side descriptor heap
 		d3dDevice->CreateUnorderedAccessView(m_uavOutputBuffer.Get(), m_uavOutputBuffer.Get(), &uavDesc, m_uavHeap->GetCPUDescriptorHandleForHeapStart());
-		//d3dDevice->CreateUnorderedAccessView(m_uavInputBuffer.Get(), m_uavInputBuffer.Get(), &uavDesc, m_uavHeap->GetCPUDescriptorHandleForHeapStart());//ERROR 
+		d3dDevice->CreateUnorderedAccessView(m_uavInputBuffer.Get(), m_uavInputBuffer.Get(), &uavDesc, m_uavHeap->GetCPUDescriptorHandleForHeapStart());//ERROR 
 
 
 		// Upload data from upload buffer to UAV input buffer
@@ -367,13 +367,73 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		UpdateSubresources(m_commandList.Get(), m_uavInputBuffer.Get(), m_uavUploadBufferA.Get(), 0, 0, 1, &uploadData);
 		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
 
+		/////////////////////////
+		m_commandList->SetComputeRootSignature(m_computeRootSignature.Get());
+		ID3D12DescriptorHeap* ppHeaps[] = { m_uavHeap.Get() };
+		m_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+
+		CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle(m_uavHeap->GetGPUDescriptorHandleForHeapStart());
+		m_commandList->SetComputeRootDescriptorTable(0, gpuHandle);
+
+		m_commandList->Dispatch(1, 1, 1);
+
+		/////////////////////////////
+
 		// Close the command list and execute it.
 		DX::ThrowIfFailed(m_commandList->Close());
 		ID3D12CommandList* ppCommandList[] = { m_commandList.Get() };
 		m_deviceResources->GetCommandQueue()->ExecuteCommandLists(_countof(ppCommandList), ppCommandList);
 
 		m_deviceResources->WaitForGpu();
-		
+
+		///////////////////////start
+
+		DX::ThrowIfFailed(m_deviceResources->GetCommandAllocator()->Reset());
+		DX::ThrowIfFailed(m_commandList->Reset(m_deviceResources->GetCommandAllocator(), m_computePipelineState.Get()));
+
+		ComPtr<ID3D12Resource> readBackBuffer;
+		DX::ThrowIfFailed(d3dDevice->CreateCommittedResource(
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_READBACK),
+			D3D12_HEAP_FLAG_NONE,
+			&CD3DX12_RESOURCE_DESC(CD3DX12_RESOURCE_DESC::Buffer(datap.size() * sizeof(Particle) + sizeof(UINT))),
+			D3D12_RESOURCE_STATE_COPY_DEST,
+			nullptr,
+			IID_PPV_ARGS(&readBackBuffer)));
+
+		NAME_D3D12_OBJECT(readBackBuffer);
+
+		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavOutputBuffer.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE));
+		m_commandList->CopyResource(readBackBuffer.Get(), m_uavOutputBuffer.Get());
+		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavOutputBuffer.Get(), D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
+
+		DX::ThrowIfFailed(m_commandList->Close());
+		m_deviceResources->GetCommandQueue()->ExecuteCommandLists(_countof(ppCommandList), ppCommandList);
+		m_deviceResources->WaitForGpu();
+
+		Particle* mappedData = nullptr;
+		HRESULT r = readBackBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mappedData));
+
+
+		if (FAILED(r))
+			d3dDevice->GetDeviceRemovedReason();
+
+
+		std::ofstream fout("C:\\Users\\Vichaya Chantamoke\\Documents\\results.txt");
+
+		if (fout.is_open())
+			;//while (true);// fout << "F" << std::endl;
+		else
+		{
+			//while (true);
+		}
+
+		for (int i = 0; i < datapsize; ++i)
+		{
+			fout << "Position: " << mappedData[i].Position << std::endl;
+			fout << "Velocity: " << mappedData[i].Velocity << std::endl << std::endl;
+		}
+
+		readBackBuffer->Unmap(0, nullptr);
 		});
 
 	createComputeBufferTask.then([this]() {
@@ -474,6 +534,7 @@ void Sample3DSceneRenderer::Update(DX::StepTimer const& timer, MoveLookControlle
 			XMVECTORF32{ 0.0f, 1.0f, 0.0f, 0.0f })));
 
 		// Update the constant buffer resource.
+		//MC: GetCurrentFrameIndex is used to offset into the constant buffer resource.
 		UINT8* destination = m_mappedConstantBuffer + (m_deviceResources->GetCurrentFrameIndex() * c_alignedConstantBufferSize);
 		memcpy(destination, &m_constantBufferData, sizeof(m_constantBufferData));
 	}
@@ -515,6 +576,7 @@ bool Sample3DSceneRenderer::Render()
 		m_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
 		// Bind the current frame's constant buffer to the pipeline.
+		//MC: GetCurrentFrameIndex is used to offset into the descriptor heap.
 		CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle(m_cbvHeap->GetGPUDescriptorHandleForHeapStart(), m_deviceResources->GetCurrentFrameIndex(), m_cbvDescriptorSize);
 		m_commandList->SetGraphicsRootDescriptorTable(0, gpuHandle);
 
