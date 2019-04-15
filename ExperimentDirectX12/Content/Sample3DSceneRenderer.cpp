@@ -23,6 +23,8 @@
 //	stages of the rendering pipeline.
 //Descriptor heaps are the memory backing for descriptors.
 //Essentially, if a resource is described by a descriptor, it is ON THE GPU and being USED by it.
+//Root signature is a binding convention, defined by the application, that is used by shaders to locate the resources
+//	that they need access to.
 
 #include "pch.h"
 #include "Sample3DSceneRenderer.h"
@@ -296,7 +298,8 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 			float Velocity;
 		};
 
-		std::vector<Particle> datap(6);
+		int datapsize = 512;
+		std::vector<Particle> datap(datapsize);
 
 		// Is this a mappable resource?
 		// Create the UAV output buffer resource. Will be bound to the GPU pipeline.
@@ -335,27 +338,29 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		NAME_D3D12_OBJECT(m_uavUploadBufferA);
 
 		// The space for the UAV counter is located at the end of the buffer. Therefore the offset is 6 * sizeof(Particle) to get to the counter.
+		// Size of the buffer must be 4096 bytes or more for buffer with UAV counters.
 		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 		uavDesc.Format = DXGI_FORMAT_UNKNOWN;
 		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
-		uavDesc.Buffer.CounterOffsetInBytes = datap.size() * sizeof(Particle); //ERROR
+		uavDesc.Buffer.CounterOffsetInBytes = datap.size() * sizeof(Particle);
 		uavDesc.Buffer.FirstElement = 0;
 		uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
-		uavDesc.Buffer.NumElements = 6;
+		uavDesc.Buffer.NumElements = datap.size();
 		uavDesc.Buffer.StructureByteStride = sizeof(Particle);
 
 		// Last parameter maybe for allowing offset to other UAV descriptor in the same heap?
 		// This function creates a UAV descriptor and places it in the CPU side descriptor heap
-		//d3dDevice->CreateUnorderedAccessView(m_uavOutputBuffer.Get(), m_uavOutputBuffer.Get(), &uavDesc, m_uavHeap->GetCPUDescriptorHandleForHeapStart());
+		d3dDevice->CreateUnorderedAccessView(m_uavOutputBuffer.Get(), m_uavOutputBuffer.Get(), &uavDesc, m_uavHeap->GetCPUDescriptorHandleForHeapStart());
 		//d3dDevice->CreateUnorderedAccessView(m_uavInputBuffer.Get(), m_uavInputBuffer.Get(), &uavDesc, m_uavHeap->GetCPUDescriptorHandleForHeapStart());//ERROR 
 
 
 		// Upload data from upload buffer to UAV input buffer
-		datap = { {0.0f, 1.0f}, {1.0f, 2.0f}, {2.0f, 3.0f}, {3.0f, 4.0f}, {4.0f, 5.0f}, {5.0f, 6.0f} };
+		for (int i = 0; i < datapsize; ++i)
+			datap[i].Position = datap[i].Velocity = (float)i;
 
 		D3D12_SUBRESOURCE_DATA uploadData = {};
 		uploadData.pData = reinterpret_cast<BYTE*>(&datap);
-		uploadData.RowPitch = sizeof(datap);
+		uploadData.RowPitch = datap.size() * sizeof(Particle);
 		uploadData.SlicePitch = uploadData.RowPitch;
 
 		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST));
