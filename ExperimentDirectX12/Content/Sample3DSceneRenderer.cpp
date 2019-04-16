@@ -411,27 +411,18 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		m_deviceResources->WaitForGpu();
 
 		Particle* mappedData = nullptr;
-		HRESULT r = readBackBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mappedData));
+		DX::ThrowIfFailed(readBackBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mappedData)));
 
-
-		if (FAILED(r))
-			d3dDevice->GetDeviceRemovedReason();
-
-
-		std::ofstream fout("C:\\Users\\Vichaya Chantamoke\\Documents\\results.txt");
-
-		if (fout.is_open())
-			;//while (true);// fout << "F" << std::endl;
-		else
-		{
-			//while (true);
-		}
+		std::ofstream fout("results.txt");
 
 		for (int i = 0; i < datapsize; ++i)
 		{
 			fout << "Position: " << mappedData[i].Position << std::endl;
 			fout << "Velocity: " << mappedData[i].Velocity << std::endl << std::endl;
 		}
+
+		StorageFolder^ storageFolder = ApplicationData::Current->LocalFolder;
+		concurrency::create_task(storageFolder->CreateFileAsync("results.txt", CreationCollisionOption::ReplaceExisting));
 
 		readBackBuffer->Unmap(0, nullptr);
 		});
