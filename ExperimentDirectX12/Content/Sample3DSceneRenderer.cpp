@@ -350,8 +350,10 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 
 		// Last parameter maybe for allowing offset to other UAV descriptor in the same heap?
 		// This function creates a UAV descriptor and places it in the CPU side descriptor heap
-		d3dDevice->CreateUnorderedAccessView(m_uavOutputBuffer.Get(), m_uavOutputBuffer.Get(), &uavDesc, m_uavHeap->GetCPUDescriptorHandleForHeapStart());
-		d3dDevice->CreateUnorderedAccessView(m_uavInputBuffer.Get(), m_uavInputBuffer.Get(), &uavDesc, m_uavHeap->GetCPUDescriptorHandleForHeapStart());//ERROR 
+		CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle(m_uavHeap->GetCPUDescriptorHandleForHeapStart());
+		auto incrementSize = d3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		d3dDevice->CreateUnorderedAccessView(m_uavOutputBuffer.Get(), m_uavOutputBuffer.Get(), &uavDesc, cpuHandle.Offset(incrementSize));
+		d3dDevice->CreateUnorderedAccessView(m_uavInputBuffer.Get(), m_uavInputBuffer.Get(), &uavDesc, m_uavHeap->GetCPUDescriptorHandleForHeapStart()); 
 
 
 		// Upload data from upload buffer to UAV input buffer
@@ -407,7 +409,6 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavOutputBuffer.Get(), D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
 
 		DX::ThrowIfFailed(m_commandList->Close()); 
-		*ppCommandList = { m_commandList.Get() };
 		m_deviceResources->GetCommandQueue()->ExecuteCommandLists(_countof(ppCommandList), ppCommandList);
 		m_deviceResources->WaitForGpu();
 
@@ -415,14 +416,15 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		DX::ThrowIfFailed(readBackBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mappedData)));
 
 		StorageFolder^ storageFolder = ApplicationData::Current->LocalFolder;
-		create_task(storageFolder->CreateFileAsync("results.txt", CreationCollisionOption::ReplaceExisting)).then([datapsize, mappedData, datap](StorageFile^ resultFile)
+		create_task(storageFolder->CreateFileAsync("results.txt", CreationCollisionOption::ReplaceExisting)).then([datapsize, mappedData](StorageFile^ resultFile)
 			{
 				Platform::String^ resultData;
 
-				for (int i = 0; i < 4; ++i)
+				for (int i = 0; i < datapsize; ++i)
 				{
-					resultData = resultData + 
-						("Position: " + mappedData[i].Position + datap[i].Position) +
+					resultData = 
+						resultData + 
+						("Position: " + mappedData[i].Position) +
 						("\nVelocity: " + mappedData[i].Velocity) + "\n\n";
 				}
 
