@@ -33,7 +33,7 @@
 #include "..\Common\DirectXHelper.h"
 #include <ppltasks.h>
 #include <synchapi.h>
-#include <fstream>
+
 using namespace ExperimentDirectX12;
 
 using namespace Concurrency;
@@ -406,23 +406,28 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		m_commandList->CopyResource(readBackBuffer.Get(), m_uavOutputBuffer.Get());
 		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavOutputBuffer.Get(), D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
 
-		DX::ThrowIfFailed(m_commandList->Close());
+		DX::ThrowIfFailed(m_commandList->Close()); 
+		*ppCommandList = { m_commandList.Get() };
 		m_deviceResources->GetCommandQueue()->ExecuteCommandLists(_countof(ppCommandList), ppCommandList);
 		m_deviceResources->WaitForGpu();
 
 		Particle* mappedData = nullptr;
 		DX::ThrowIfFailed(readBackBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mappedData)));
 
-		std::ofstream fout("results.txt");
-
-		for (int i = 0; i < datapsize; ++i)
-		{
-			fout << "Position: " << mappedData[i].Position << std::endl;
-			fout << "Velocity: " << mappedData[i].Velocity << std::endl << std::endl;
-		}
-
 		StorageFolder^ storageFolder = ApplicationData::Current->LocalFolder;
-		concurrency::create_task(storageFolder->CreateFileAsync("results.txt", CreationCollisionOption::ReplaceExisting));
+		create_task(storageFolder->CreateFileAsync("results.txt", CreationCollisionOption::ReplaceExisting)).then([datapsize, mappedData, datap](StorageFile^ resultFile)
+			{
+				Platform::String^ resultData;
+
+				for (int i = 0; i < 4; ++i)
+				{
+					resultData = resultData + 
+						("Position: " + mappedData[i].Position + datap[i].Position) +
+						("\nVelocity: " + mappedData[i].Velocity) + "\n\n";
+				}
+
+				create_task(FileIO::WriteTextAsync(resultFile, resultData));
+			});
 
 		readBackBuffer->Unmap(0, nullptr);
 		});
