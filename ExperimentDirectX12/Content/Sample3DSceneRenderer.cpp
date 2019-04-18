@@ -358,16 +358,16 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 
 		// Upload data from upload buffer to UAV input buffer
 		for (int i = 0; i < datapsize; ++i)
-			datap[i].Position = datap[i].Velocity = (float)i;
+			datap[i].Position = datap[i].Velocity = 8.0f;
 
 		D3D12_SUBRESOURCE_DATA uploadData = {};
 		uploadData.pData = reinterpret_cast<BYTE*>(&datap);
 		uploadData.RowPitch = datap.size() * sizeof(Particle);
 		uploadData.SlicePitch = uploadData.RowPitch;
 
-		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST));
-		UpdateSubresources(m_commandList.Get(), m_uavInputBuffer.Get(), m_uavUploadBufferA.Get(), 0, 0, 1, &uploadData);
-		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
+		//m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST));
+		//UpdateSubresources(m_commandList.Get(), m_uavInputBuffer.Get(), m_uavUploadBufferA.Get(), 0, 0, 1, &uploadData);
+		//m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
 
 		/////////////////////////
 		m_commandList->SetComputeRootSignature(m_computeRootSignature.Get());
@@ -377,7 +377,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle(m_uavHeap->GetGPUDescriptorHandleForHeapStart());
 		m_commandList->SetComputeRootDescriptorTable(0, gpuHandle);
 
-		m_commandList->Dispatch(1, 1, 1);
+		m_commandList->Dispatch(2, 1, 1);
 
 		/////////////////////////////
 
@@ -425,7 +425,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 					resultData = 
 						resultData + 
 						("Position: " + mappedData[i].Position) +
-						("\nVelocity: " + mappedData[i].Velocity) + "\n\n";
+						("\nVelocity: " + mappedData[i].Velocity) + "\n" + i + "\n\n";
 				}
 
 				create_task(FileIO::WriteTextAsync(resultFile, resultData));
