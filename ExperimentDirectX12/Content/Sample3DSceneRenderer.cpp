@@ -360,14 +360,16 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		for (int i = 0; i < datapsize; ++i)
 			datap[i].Position = datap[i].Velocity = 8.0f;
 
+		
+
 		D3D12_SUBRESOURCE_DATA uploadData = {};
-		uploadData.pData = reinterpret_cast<BYTE*>(&datap);
-		uploadData.RowPitch = datap.size() * sizeof(Particle);
+		uploadData.pData = datap.data();
+		uploadData.RowPitch = datap.size() * sizeof(Particle) + sizeof(UINT);
 		uploadData.SlicePitch = uploadData.RowPitch;
 
-		//m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST));
-		//UpdateSubresources(m_commandList.Get(), m_uavInputBuffer.Get(), m_uavUploadBufferA.Get(), 0, 0, 1, &uploadData);
-		//m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
+		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST));
+		UpdateSubresources(m_commandList.Get(), m_uavInputBuffer.Get(), m_uavUploadBufferA.Get(), 0, 0, 1, &uploadData);
+		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
 
 		/////////////////////////
 		m_commandList->SetComputeRootSignature(m_computeRootSignature.Get());
