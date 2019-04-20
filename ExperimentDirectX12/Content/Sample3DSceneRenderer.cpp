@@ -406,9 +406,9 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 
 		NAME_D3D12_OBJECT(readBackBuffer);
 
-		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE));
-		m_commandList->CopyResource(readBackBuffer.Get(), m_uavInputBuffer.Get());
-		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
+		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavOutputBuffer.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE));
+		m_commandList->CopyResource(readBackBuffer.Get(), m_uavOutputBuffer.Get());
+		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavOutputBuffer.Get(), D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
 
 		DX::ThrowIfFailed(m_commandList->Close()); 
 		m_deviceResources->GetCommandQueue()->ExecuteCommandLists(_countof(ppCommandList), ppCommandList);
