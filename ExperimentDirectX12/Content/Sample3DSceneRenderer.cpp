@@ -351,14 +351,13 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		// Last parameter maybe for allowing offset to other UAV descriptor in the same heap?
 		// This function creates a UAV descriptor and places it in the CPU side descriptor heap
 		CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle(m_uavHeap->GetCPUDescriptorHandleForHeapStart());
-		auto incrementSize = d3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-		d3dDevice->CreateUnorderedAccessView(m_uavOutputBuffer.Get(), m_uavOutputBuffer.Get(), &uavDesc, cpuHandle.Offset(incrementSize));
+		auto incrementSize = d3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);	
 		d3dDevice->CreateUnorderedAccessView(m_uavInputBuffer.Get(), m_uavInputBuffer.Get(), &uavDesc, m_uavHeap->GetCPUDescriptorHandleForHeapStart()); 
-
+		d3dDevice->CreateUnorderedAccessView(m_uavOutputBuffer.Get(), m_uavOutputBuffer.Get(), &uavDesc, cpuHandle.Offset(incrementSize));
 
 		// Upload data from upload buffer to UAV input buffer
 		for (int i = 0; i < datapsize; ++i)
-			datap[i].Position = datap[i].Velocity = 4.0f;
+			datap[i].Position = datap[i].Velocity = 7.0f;
 
 		
 
