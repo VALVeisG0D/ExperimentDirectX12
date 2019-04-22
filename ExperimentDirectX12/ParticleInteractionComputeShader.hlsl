@@ -4,8 +4,8 @@ struct Particle
 	float Velocity;
 };
 
-RWStructuredBuffer<Particle> gInput : register(u0);
-RWStructuredBuffer<Particle> gOutput : register(u1);
+RWStructuredBuffer<Particle> gInput;
+RWStructuredBuffer<Particle> gOutput;
 
 [numthreads(256, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
