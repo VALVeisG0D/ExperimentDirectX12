@@ -184,6 +184,7 @@ void MoveLookController::Initialize(CoreWindow ^ window)
 	m_moveCommand = XMFLOAT3(0.0f, 0.0f, 0.0f);
 
 	SetOrientation(0, 0);			// Look straight ahead when the app starts.
+	SetPosition({ 0.0f, 0.0f, -3.0f });	// Set initial position of the camera.
 }
 
 void MoveLookController::Update(CoreWindow ^ window)
