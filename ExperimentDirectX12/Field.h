@@ -60,9 +60,18 @@ Field::Field()
 	for (int x = 0; x < DEFAULT_DIMENSION; ++x)
 		for (int y = 0; y < DEFAULT_DIMENSION; ++y)
 			field[y][x][DEFAULT_DIMENSION - 1] = field[y][x][0] = 1;
+
+	// Loop to add particles in a linear, predictable fashion.
+	for (int i = 0; i < DEFAULT_NUMBER_OF_PARTICLES; ++i)
+		AddParticle
+		(
+			particleList[i].yCoordinate = coordinateToFieldIndex(0),
+			particleList[i].xCoordinate = coordinateToFieldIndex(i + i),
+			particleList[i].zCoordinate = coordinateToFieldIndex(0)
+		);
 	
 	// Add particles
-	AddParticle(particleList[0].yCoordinate = coordinateToFieldIndex(0), 
+	/*AddParticle(particleList[0].yCoordinate = coordinateToFieldIndex(0), 
 		particleList[0].xCoordinate = coordinateToFieldIndex(-2),
 		particleList[0].zCoordinate = coordinateToFieldIndex(0));
 	AddParticle(particleList[1].yCoordinate = coordinateToFieldIndex(0), 
@@ -79,7 +88,7 @@ Field::Field()
 		particleList[4].zCoordinate = coordinateToFieldIndex(-2));
 	AddParticle(particleList[5].yCoordinate = coordinateToFieldIndex(2),
 		particleList[5].xCoordinate = coordinateToFieldIndex(4),
-		particleList[5].zCoordinate = coordinateToFieldIndex(-2));
+		particleList[5].zCoordinate = coordinateToFieldIndex(-2));*/
 }
 
 Field::~Field()
