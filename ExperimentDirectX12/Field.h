@@ -1,11 +1,12 @@
 // Speed of light exists because the computer simulating our reality is not powerful enough to perform computation beyond that limit.
+// Three places to change in Sample3DSceneRenderer.cpp and 2 in this file to change 
+//	number of particles
 #pragma once
 constexpr auto DEFAULT_DIMENSION = 256;
-constexpr auto DEFAULT_NUMBER_OF_PARTICLES = 6;	//	Three places to change in Sample3DSceneRenderer.cpp and 2 in this file to change 
-												//		number of particles
 
 class Field
 {
+	int DEFAULT_NUMBER_OF_PARTICLES;
 	int (*field)[DEFAULT_DIMENSION][DEFAULT_DIMENSION];
 
 	struct Particle
@@ -24,7 +25,7 @@ class Field
 	Particle* particleList;
 
 public:
-	Field();
+	Field(int numOfParticles);
 	~Field();
 
 	void AddParticle(int, int, int);
@@ -36,8 +37,10 @@ public:
 	int coordinateToFieldIndex(int);
 };
 
-Field::Field()
+Field::Field(int numOfParticles)
 {
+	DEFAULT_NUMBER_OF_PARTICLES = numOfParticles;
+
 	// Create field array and particles
 	field = new int[DEFAULT_DIMENSION][DEFAULT_DIMENSION][DEFAULT_DIMENSION]();
 	particleList = new Particle[DEFAULT_NUMBER_OF_PARTICLES]();
