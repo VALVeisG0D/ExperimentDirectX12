@@ -162,8 +162,13 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		DX::ThrowIfFailed(d3dDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_deviceResources->GetCommandAllocator(), m_pipelineState.Get(), IID_PPV_ARGS(&m_commandList)));
         NAME_D3D12_OBJECT(m_commandList);
 
+		VertexPositionColor instanceData[6];
+
+		for (int i = 0; i < 6; ++i)
+			instanceData[i] = { XMFLOAT3(field.xFieldIndexToCoordinate(i), field.yFieldIndexToCoordinate(i), field.zFieldIndexToCoordinate(i)), XMFLOAT3(1.0f, 1.0f, 1.0f) };
+
 		// Instance data. Each instance data has a position and color
-		VertexPositionColor instanceData[] = 
+		/*VertexPositionColor instanceData[] = 
 		{
 			{XMFLOAT3(field.xFieldIndexToCoordinate(0), field.yFieldIndexToCoordinate(0), field.zFieldIndexToCoordinate(0)), XMFLOAT3(0.0f, 1.0f, 1.0f)},
 			{XMFLOAT3(field.xFieldIndexToCoordinate(1), field.yFieldIndexToCoordinate(1), field.zFieldIndexToCoordinate(1)), XMFLOAT3(1.0f, 1.0f, 1.0f)},
@@ -171,7 +176,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 			{XMFLOAT3(field.xFieldIndexToCoordinate(3), field.yFieldIndexToCoordinate(3), field.zFieldIndexToCoordinate(3)), XMFLOAT3(0.0f, 1.0f, 1.0f)},
 			{XMFLOAT3(field.xFieldIndexToCoordinate(4), field.yFieldIndexToCoordinate(4), field.zFieldIndexToCoordinate(4)), XMFLOAT3(1.0f, 1.0f, 1.0f)},
 			{XMFLOAT3(field.xFieldIndexToCoordinate(5), field.yFieldIndexToCoordinate(5), field.zFieldIndexToCoordinate(5)), XMFLOAT3(1.0f, 0.75f, 0.79f)}
-		};
+		};*/
 
 		const UINT instanceBufferSize = sizeof(instanceData);
 
