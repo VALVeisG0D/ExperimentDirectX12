@@ -2,7 +2,7 @@
 // Three places to change in Sample3DSceneRenderer.cpp and 2 in this file to change 
 //	number of particles
 #pragma once
-constexpr auto DEFAULT_DIMENSION = 256;
+constexpr auto DEFAULT_DIMENSION = 512;
 
 class Field
 {
