@@ -1,11 +1,18 @@
 struct Particle
 {
+	int3 Coordinate;
+	int3 Inertia;
+	int3 PositionChange;
+};
+
+struct Particlef
+{
 	float Position;
 	float Velocity;
 };
 
-RWStructuredBuffer<Particle> gInput;
-RWStructuredBuffer<Particle> gOutput;
+RWStructuredBuffer<Particlef> gInput;
+RWStructuredBuffer<Particlef> gOutput;
 
 [numthreads(256, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
