@@ -10,7 +10,7 @@ struct Particlef
 	float Position;
 	float Velocity;
 };
-
+int field[4][4][4];
 RWStructuredBuffer<Particlef> gInput;
 RWStructuredBuffer<Particlef> gOutput;
 
