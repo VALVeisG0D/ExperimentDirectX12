@@ -322,6 +322,17 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 
 		NAME_D3D12_OBJECT(m_uavUploadBufferA);
 
+		// Create the readback buffer. Read the data back from the input buffer.
+		DX::ThrowIfFailed(d3dDevice->CreateCommittedResource(
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_READBACK),
+			D3D12_HEAP_FLAG_NONE,
+			&CD3DX12_RESOURCE_DESC(CD3DX12_RESOURCE_DESC::Buffer(datap.size() * sizeof(Particle))),
+			D3D12_RESOURCE_STATE_COPY_DEST,
+			nullptr,
+			IID_PPV_ARGS(&m_readBackBuffer)));
+
+		NAME_D3D12_OBJECT(m_readBackBuffer);
+
 		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 		uavDesc.Format = DXGI_FORMAT_UNKNOWN;
 		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
@@ -331,11 +342,9 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		uavDesc.Buffer.NumElements = datap.size();
 		uavDesc.Buffer.StructureByteStride = sizeof(Particle);
 
-		// Last parameter maybe for allowing offset to other UAV descriptor in the same heap?
+		// Last parameter maybe for allowing offset to other UAV descriptor in the same heap
 		// This function creates a UAV descriptor and places it in the CPU side descriptor heap
-		CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle(m_uavHeap->GetCPUDescriptorHandleForHeapStart());
-		auto incrementSize = d3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);	
-		d3dDevice->CreateUnorderedAccessView(m_uavInputBuffer.Get(), nullptr, &uavDesc, cpuHandle); 
+		d3dDevice->CreateUnorderedAccessView(m_uavInputBuffer.Get(), nullptr, &uavDesc, m_uavHeap->GetCPUDescriptorHandleForHeapStart()); 
 
 		// Upload data from upload buffer to UAV input buffer
 		for (int i = 0; i < datapsize; ++i)
@@ -350,74 +359,18 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		UpdateSubresources(m_commandList.Get(), m_uavInputBuffer.Get(), m_uavUploadBufferA.Get(), 0, 0, 1, &uploadData);
 		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
 
-		/////////////////////////
-		m_commandList->SetComputeRootSignature(m_computeRootSignature.Get());
-		ID3D12DescriptorHeap* ppHeaps[] = { m_uavHeap.Get() };
-		m_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-
-		CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle(m_uavHeap->GetGPUDescriptorHandleForHeapStart());
-		m_commandList->SetComputeRootDescriptorTable(0, gpuHandle);
-
-		m_commandList->Dispatch(2, 1, 1);
-
-		/////////////////////////////
-
 		// Close the command list and execute it.
 		DX::ThrowIfFailed(m_commandList->Close());
 		ID3D12CommandList* ppCommandList[] = { m_commandList.Get() };
 		m_deviceResources->GetCommandQueue()->ExecuteCommandLists(_countof(ppCommandList), ppCommandList);
-
 		m_deviceResources->WaitForGpu();
 
-		///////////////////////start
-
-		DX::ThrowIfFailed(m_deviceResources->GetCommandAllocator()->Reset());
-		DX::ThrowIfFailed(m_commandList->Reset(m_deviceResources->GetCommandAllocator(), m_computePipelineState.Get()));
-
-		ComPtr<ID3D12Resource> readBackBuffer;
-		DX::ThrowIfFailed(d3dDevice->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_READBACK),
-			D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC(CD3DX12_RESOURCE_DESC::Buffer(datap.size() * sizeof(Particle))),
-			D3D12_RESOURCE_STATE_COPY_DEST,
-			nullptr,
-			IID_PPV_ARGS(&readBackBuffer)));
-
-		NAME_D3D12_OBJECT(readBackBuffer);
-
-		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE));
-		m_commandList->CopyResource(readBackBuffer.Get(), m_uavInputBuffer.Get());
-		m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
-
-		DX::ThrowIfFailed(m_commandList->Close()); 
-		m_deviceResources->GetCommandQueue()->ExecuteCommandLists(_countof(ppCommandList), ppCommandList);
-		m_deviceResources->WaitForGpu();
-
-		Particle* mappedData = nullptr;
-		DX::ThrowIfFailed(readBackBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mappedData)));
-
-		StorageFolder^ storageFolder = ApplicationData::Current->LocalFolder;
-		create_task(storageFolder->CreateFileAsync("results.txt", CreationCollisionOption::ReplaceExisting)).then([datapsize, mappedData](StorageFile^ resultFile)
-			{
-				Platform::String^ resultData;
-
-				for (int i = 0; i < datapsize; ++i)
-				{
-					resultData = 
-						resultData + 
-						("Position: " + mappedData[i].Position) +
-						("\nVelocity: " + mappedData[i].Velocity) + "\n" + i + "\n\n";
-				}
-
-				create_task(FileIO::WriteTextAsync(resultFile, resultData));
-			});
-
-		readBackBuffer->Unmap(0, nullptr);
+		Compute();
 		});
 
 	createComputeBufferTask.then([this]() {
 		m_loadingComplete = true;	
-	});	
+	});		
 }
 
 // Initializes view parameters when the window size changes.
@@ -467,7 +420,73 @@ void Sample3DSceneRenderer::CreateWindowSizeDependentResources()
 	XMStoreFloat4x4(&m_constantBufferData.view, XMMatrixTranspose(XMMatrixLookAtRH(eye, at, up)));
 }
 
-// Called once per frame, rotates the cube and calculates the model and view matrices.
+void ExperimentDirectX12::Sample3DSceneRenderer::Compute()
+{
+	DX::ThrowIfFailed(m_deviceResources->GetCommandAllocator()->Reset());
+	DX::ThrowIfFailed(m_commandList->Reset(m_deviceResources->GetCommandAllocator(), m_computePipelineState.Get()));
+	struct Particle
+	{
+		float Position;
+		float Velocity;
+	};
+
+	int datapsize = 512;
+	std::vector<Particle> datap(datapsize);
+
+	m_commandList->SetComputeRootSignature(m_computeRootSignature.Get());
+	ID3D12DescriptorHeap* ppHeaps[] = { m_uavHeap.Get() };
+	m_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+
+	CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle(m_uavHeap->GetGPUDescriptorHandleForHeapStart());
+	m_commandList->SetComputeRootDescriptorTable(0, gpuHandle);
+
+	m_commandList->Dispatch(2, 1, 1);
+
+	/////////////////////////////
+
+	// Close the command list and execute it.
+	DX::ThrowIfFailed(m_commandList->Close());
+	ID3D12CommandList* ppCommandList[] = { m_commandList.Get() };
+	m_deviceResources->GetCommandQueue()->ExecuteCommandLists(_countof(ppCommandList), ppCommandList);
+
+	m_deviceResources->WaitForGpu();
+
+	///////////////////////start
+
+	DX::ThrowIfFailed(m_deviceResources->GetCommandAllocator()->Reset());
+	DX::ThrowIfFailed(m_commandList->Reset(m_deviceResources->GetCommandAllocator(), m_computePipelineState.Get()));
+
+	m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE));
+	m_commandList->CopyResource(m_readBackBuffer.Get(), m_uavInputBuffer.Get());
+	m_commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_uavInputBuffer.Get(), D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
+
+	DX::ThrowIfFailed(m_commandList->Close());
+	m_deviceResources->GetCommandQueue()->ExecuteCommandLists(_countof(ppCommandList), ppCommandList);
+	m_deviceResources->WaitForGpu();
+
+	Particle* mappedData = nullptr;
+	DX::ThrowIfFailed(m_readBackBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mappedData)));
+
+	StorageFolder^ storageFolder = ApplicationData::Current->LocalFolder;
+	create_task(storageFolder->CreateFileAsync("results.txt", CreationCollisionOption::ReplaceExisting)).then([datapsize, mappedData](StorageFile ^ resultFile)
+		{
+			Platform::String^ resultData;
+
+			for (int i = 0; i < datapsize; ++i)
+			{
+				resultData =
+					resultData +
+					("Position: " + mappedData[i].Position) +
+					("\nVelocity: " + mappedData[i].Velocity) + "\n" + i + "\n\n";
+			}
+
+			create_task(FileIO::WriteTextAsync(resultFile, resultData));
+		});
+
+	m_readBackBuffer->Unmap(0, nullptr);
+}
+
+// Called once per frame, calculates the model and view matrices.
 void Sample3DSceneRenderer::Update(DX::StepTimer const& timer, MoveLookController^ moveLookController)
 {
 	if (m_loadingComplete)

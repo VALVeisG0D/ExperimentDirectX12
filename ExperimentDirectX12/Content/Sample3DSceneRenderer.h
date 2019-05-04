@@ -15,9 +15,10 @@ namespace ExperimentDirectX12
 		~Sample3DSceneRenderer();
 		void CreateDeviceDependentResources();
 		void CreateWindowSizeDependentResources();
+		void Compute();
 		void Update(DX::StepTimer const& timer, MoveLookController^ moveLookController);
 		void UpdateVertexBuffer(UINT dataBufferSize, VertexPositionColor *data, Microsoft::WRL::ComPtr<ID3D12Resource> &dataBufferUpload);
-		bool Render();
+		bool Render();	
 
 	private:
 		// Constant buffers must be 256-byte aligned.
@@ -37,11 +38,10 @@ namespace ExperimentDirectX12
 		Microsoft::WRL::ComPtr<ID3D12Resource>				m_vertexBuffer;
 		Microsoft::WRL::ComPtr<ID3D12Resource>				m_instanceBuffer;
 		Microsoft::WRL::ComPtr<ID3D12Resource>				m_instanceBufferUpload;
-		Microsoft::WRL::ComPtr<ID3D12Resource>				m_indexBuffer;
 		Microsoft::WRL::ComPtr<ID3D12Resource>				m_constantBuffer;
 		Microsoft::WRL::ComPtr<ID3D12Resource>				m_uavUploadBufferA;
 		Microsoft::WRL::ComPtr<ID3D12Resource>				m_uavInputBuffer;
-		Microsoft::WRL::ComPtr<ID3D12Resource>				m_uavOutputBuffer;
+		Microsoft::WRL::ComPtr<ID3D12Resource>				m_readBackBuffer;
 		ModelViewProjectionConstantBuffer					m_constantBufferData;
 		UINT8*												m_mappedConstantBuffer;
 		UINT												m_cbvDescriptorSize;
@@ -51,7 +51,6 @@ namespace ExperimentDirectX12
 		std::vector<byte>									m_computeShader;
 		D3D12_VERTEX_BUFFER_VIEW							m_vertexBufferView;
 		D3D12_VERTEX_BUFFER_VIEW							m_instanceBufferView;
-		D3D12_INDEX_BUFFER_VIEW								m_indexBufferView;
 
 		// Variables used with the rendering loop.
 		bool	m_loadingComplete;	
