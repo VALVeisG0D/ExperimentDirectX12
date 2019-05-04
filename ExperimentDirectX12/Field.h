@@ -72,26 +72,6 @@ Field::Field(int numOfParticles)
 			particleList[i].xCoordinate = coordinateToFieldIndex(i + i),
 			particleList[i].zCoordinate = coordinateToFieldIndex(0)
 		);
-	
-	// Add particles
-	/*AddParticle(particleList[0].yCoordinate = coordinateToFieldIndex(0), 
-		particleList[0].xCoordinate = coordinateToFieldIndex(-2),
-		particleList[0].zCoordinate = coordinateToFieldIndex(0));
-	AddParticle(particleList[1].yCoordinate = coordinateToFieldIndex(0), 
-		particleList[1].xCoordinate = coordinateToFieldIndex(0),
-		particleList[1].zCoordinate = coordinateToFieldIndex(0));
-	AddParticle(particleList[2].yCoordinate = coordinateToFieldIndex(0), 
-		particleList[2].xCoordinate = coordinateToFieldIndex(2),
-		particleList[2].zCoordinate = coordinateToFieldIndex(0));
-	AddParticle(particleList[3].yCoordinate = coordinateToFieldIndex(0),
-		particleList[3].xCoordinate = coordinateToFieldIndex(-2),
-		particleList[3].zCoordinate = coordinateToFieldIndex(-2));
-	AddParticle(particleList[4].yCoordinate = coordinateToFieldIndex(0),
-		particleList[4].xCoordinate = coordinateToFieldIndex(0),
-		particleList[4].zCoordinate = coordinateToFieldIndex(-2));
-	AddParticle(particleList[5].yCoordinate = coordinateToFieldIndex(2),
-		particleList[5].xCoordinate = coordinateToFieldIndex(4),
-		particleList[5].zCoordinate = coordinateToFieldIndex(-2));*/
 }
 
 Field::~Field()

@@ -1,3 +1,10 @@
+#define FIELD_DIMENSION 512
+
+struct Field
+{
+	int field[FIELD_DIMENSION][FIELD_DIMENSION][FIELD_DIMENSION];
+};
+
 struct Particle
 {
 	int3 Coordinate;
@@ -10,7 +17,7 @@ struct Particlef
 	float Position;
 	float Velocity;
 };
-int field[4][4][4];
+
 RWStructuredBuffer<Particlef> gInput;
 RWStructuredBuffer<Particlef> gOutput;
 
