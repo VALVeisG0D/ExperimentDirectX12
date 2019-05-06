@@ -365,7 +365,18 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		m_deviceResources->GetCommandQueue()->ExecuteCommandLists(_countof(ppCommandList), ppCommandList);
 		m_deviceResources->WaitForGpu();
 
-		Compute();
+		Platform::String^ resultData;
+
+		for (int i = 0; i < 9; ++i)
+		{
+			Compute(resultData);
+		}
+
+		StorageFolder^ storageFolder = ApplicationData::Current->LocalFolder;
+		create_task(storageFolder->GetFileAsync("results.txt")).then([resultData](StorageFile^ resultFile)
+			{
+				create_task(FileIO::WriteTextAsync(resultFile, resultData));
+			});
 		});
 
 	createComputeBufferTask.then([this]() {
@@ -420,8 +431,9 @@ void Sample3DSceneRenderer::CreateWindowSizeDependentResources()
 	XMStoreFloat4x4(&m_constantBufferData.view, XMMatrixTranspose(XMMatrixLookAtRH(eye, at, up)));
 }
 
-void ExperimentDirectX12::Sample3DSceneRenderer::Compute()
+void ExperimentDirectX12::Sample3DSceneRenderer::Compute(Platform::String^& resultData)
 {
+	resultData = "";
 	DX::ThrowIfFailed(m_deviceResources->GetCommandAllocator()->Reset());
 	DX::ThrowIfFailed(m_commandList->Reset(m_deviceResources->GetCommandAllocator(), m_computePipelineState.Get()));
 	struct Particle
@@ -467,21 +479,12 @@ void ExperimentDirectX12::Sample3DSceneRenderer::Compute()
 	Particle* mappedData = nullptr;
 	DX::ThrowIfFailed(m_readBackBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mappedData)));
 
-	StorageFolder^ storageFolder = ApplicationData::Current->LocalFolder;
-	create_task(storageFolder->CreateFileAsync("results.txt", CreationCollisionOption::ReplaceExisting)).then([datapsize, mappedData](StorageFile ^ resultFile)
-		{
-			Platform::String^ resultData;
-
-			for (int i = 0; i < datapsize; ++i)
-			{
-				resultData =
-					resultData +
-					("Position: " + mappedData[i].Position) +
-					("\nVelocity: " + mappedData[i].Velocity) + "\n" + i + "\n\n";
-			}
-
-			create_task(FileIO::WriteTextAsync(resultFile, resultData));
-		});
+	for (int i = 0; i < datapsize; ++i)
+	{
+		resultData +=
+			("Position: " + mappedData[i].Position) +
+			("\nVelocity: " + mappedData[i].Velocity) + "\n" + i + "\n\n";
+	}
 
 	m_readBackBuffer->Unmap(0, nullptr);
 }
