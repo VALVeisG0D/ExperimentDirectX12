@@ -23,6 +23,6 @@ RWStructuredBuffer<Particlef> gInputOutput;
 [numthreads(256, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {
-	gInputOutput[DTid.x].Position = gInputOutput[DTid.x].Position + 3.0f;
-	gInputOutput[DTid.x].Velocity = gInputOutput[DTid.x].Velocity + 7.0f;
+	gInputOutput[DTid.x].Position += 3.0f;
+	gInputOutput[DTid.x].Velocity += 7.0f;
 }
