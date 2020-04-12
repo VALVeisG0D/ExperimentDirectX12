@@ -24,7 +24,7 @@
 //Descriptor heaps are the memory backing for descriptors.
 //Essentially, if a resource is described by a descriptor, it is ON THE GPU and being USED by it.
 //Root signature is a binding convention, defined by the application, that is used by shaders to locate the resources
-//	that they need access to.
+//	that they need access to. Root signature binds shaders to resources.
 
 #include "pch.h"
 #include "Sample3DSceneRenderer.h"
