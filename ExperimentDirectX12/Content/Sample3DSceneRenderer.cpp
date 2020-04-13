@@ -25,6 +25,8 @@
 //Essentially, if a resource is described by a descriptor, it is ON THE GPU and being USED by it.
 //Root signature is a binding convention, defined by the application, that is used by shaders to locate the resources
 //	that they need access to. Root signature binds shaders to resources.
+//A pipeline state object maintains the state of all currently set shaders as well as certain fixed function state 
+//	objects(such as the input assembler, tesselator, rasterizerand output merger).
 
 #include "pch.h"
 #include "Sample3DSceneRenderer.h"
