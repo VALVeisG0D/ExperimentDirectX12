@@ -15,7 +15,7 @@
 //Descriptors are needed to describe data to GPU.
 //CPU->(Upload buffer)->Map->(Mapped data)->memcpy->GPU.
 //Descriptor types: SRV, CBV, UAV, Sampler etc.
-//Resources are not specified as SRV, CBV, UAV during creation.
+//Resources are not specified as SRV, CBV, UAV during creation but during binding using root signature.
 //CreateCommittedResource: creates both the resource and an implicit heap large enough to encompass the resource.
 //	The resource is mapped to the heap. |------HEAP---|--RESOURCE--|-------|
 //GPU resources are not bound directly. GPU resources are described to the GPU via descriptors. Why use descriptors?
