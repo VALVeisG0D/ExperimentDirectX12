@@ -17,7 +17,7 @@
 //Descriptor types: SRV, CBV, UAV, Sampler etc.
 //Resources are not specified as SRV, CBV, UAV during creation.
 //CreateCommittedResource: creates both the resource and an implicit heap large enough to encompass the resource.
-//	The resource is mapped to the heap.
+//	The resource is mapped to the heap. |------HEAP---|--RESOURCE--|-------|
 //GPU resources are not bound directly. GPU resources are described to the GPU via descriptors. Why use descriptors?
 //	Because GPU resource is just a generic chunk of memory. They are generic so that they can be used at different
 //	stages of the rendering pipeline.
