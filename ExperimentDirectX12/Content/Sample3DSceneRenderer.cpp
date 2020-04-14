@@ -25,6 +25,10 @@
 //Essentially, if a resource is described by a descriptor, it is ON THE GPU and being USED by it.
 //Root signature is a binding convention, defined by the application, that is used by shaders to locate the resources
 //	that they need access to. Root signature binds shaders to resources.
+//Root signature only defines what resources the application will bind to the pipeline. After setting the root
+//	signature to the pipeline with SetGraphicsRootSignature or SetComputeRootSignature, to ACTUALLY BIND the resource
+//	to the pipeline, call SetDescriptorHeap to bind the heap and SetGraphicsRootDescriptorTable, 
+//	SetComputeRootDescriptorTable, etc to bind the resource.
 //A pipeline state object maintains the state of all currently set shaders as well as certain fixed function state 
 //	objects(such as the input assembler, tesselator, rasterizerand output merger).
 
