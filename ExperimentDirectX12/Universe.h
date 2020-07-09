@@ -4,10 +4,10 @@
 #pragma once
 constexpr auto DEFAULT_DIMENSION = 512;
 
-class Field
+class Universe
 {
 	int DEFAULT_NUMBER_OF_PARTICLES;
-	int (*field)[DEFAULT_DIMENSION][DEFAULT_DIMENSION];
+	int (*cellArray)[DEFAULT_DIMENSION][DEFAULT_DIMENSION];
 
 	struct Particle
 	{
@@ -25,8 +25,8 @@ class Field
 	Particle* particleList;
 
 public:
-	Field(int numOfParticles);
-	~Field();
+	Universe(int numOfParticles);
+	~Universe();
 
 	void AddParticle(int, int, int);
 	void RemoveParticle(int, int, int);
@@ -37,32 +37,32 @@ public:
 	int coordinateToFieldIndex(int);
 };
 
-Field::Field(int numOfParticles)
+Universe::Universe(int numOfParticles)
 {
 	DEFAULT_NUMBER_OF_PARTICLES = numOfParticles;
 
-	// Create field array and particles
-	field = new int[DEFAULT_DIMENSION][DEFAULT_DIMENSION][DEFAULT_DIMENSION]();
+	// Create cellArray array and particles
+	cellArray = new int[DEFAULT_DIMENSION][DEFAULT_DIMENSION][DEFAULT_DIMENSION]();
 	particleList = new Particle[DEFAULT_NUMBER_OF_PARTICLES]();
 
-	// Create barrier along edge plane of field so that particles don't
+	// Create barrier along edge plane of cellArray so that particles don't
 	// go out of bound
 	// NOT OPTIMIZED YET
 
 	//	Top and bottom plane
 	for (int x = 0; x < DEFAULT_DIMENSION; ++x)
 		for (int z = 0; z < DEFAULT_DIMENSION; ++z)
-			field[DEFAULT_DIMENSION - 1][x][z] = field[0][x][z] = 1;
+			cellArray[DEFAULT_DIMENSION - 1][x][z] = cellArray[0][x][z] = 1;
 
 	//	Left and Right plane
 	for (int y = 0; y < DEFAULT_DIMENSION; ++y)
 		for (int z = 0; z < DEFAULT_DIMENSION; ++z)
-			field[y][0][z] = field[y][DEFAULT_DIMENSION - 1][z] = 1;
+			cellArray[y][0][z] = cellArray[y][DEFAULT_DIMENSION - 1][z] = 1;
 
 	//	Front and Back plane
 	for (int x = 0; x < DEFAULT_DIMENSION; ++x)
 		for (int y = 0; y < DEFAULT_DIMENSION; ++y)
-			field[y][x][DEFAULT_DIMENSION - 1] = field[y][x][0] = 1;
+			cellArray[y][x][DEFAULT_DIMENSION - 1] = cellArray[y][x][0] = 1;
 
 	// Loop to add particles in a linear, predictable fashion.
 	for (int i = 0; i < DEFAULT_NUMBER_OF_PARTICLES; ++i)
@@ -74,97 +74,97 @@ Field::Field(int numOfParticles)
 		);
 }
 
-Field::~Field()
+Universe::~Universe()
 {
-	delete[] field;
+	delete[] cellArray;
 	delete[] particleList;
 }
 
-inline void Field::AddParticle(int yCoordinate, int xCoordinate, int zCoordinate)
+inline void Universe::AddParticle(int yCoordinate, int xCoordinate, int zCoordinate)
 {
 	//	Top plane
-	field[yCoordinate + 1][xCoordinate - 1][zCoordinate + 1] += 1;
-	field[yCoordinate + 1][xCoordinate][zCoordinate + 1] += 1;
-	field[yCoordinate + 1][xCoordinate + 1][zCoordinate + 1] += 1;
+	cellArray[yCoordinate + 1][xCoordinate - 1][zCoordinate + 1] += 1;
+	cellArray[yCoordinate + 1][xCoordinate][zCoordinate + 1] += 1;
+	cellArray[yCoordinate + 1][xCoordinate + 1][zCoordinate + 1] += 1;
 
-	field[yCoordinate][xCoordinate - 1][zCoordinate + 1] += 1;
-	field[yCoordinate][xCoordinate][zCoordinate + 1] += 1;
-	field[yCoordinate][xCoordinate + 1][zCoordinate + 1] += 1;
+	cellArray[yCoordinate][xCoordinate - 1][zCoordinate + 1] += 1;
+	cellArray[yCoordinate][xCoordinate][zCoordinate + 1] += 1;
+	cellArray[yCoordinate][xCoordinate + 1][zCoordinate + 1] += 1;
 
-	field[yCoordinate - 1][xCoordinate - 1][zCoordinate + 1] += 1;
-	field[yCoordinate - 1][xCoordinate][zCoordinate + 1] += 1;
-	field[yCoordinate - 1][xCoordinate + 1][zCoordinate + 1] += 1;
+	cellArray[yCoordinate - 1][xCoordinate - 1][zCoordinate + 1] += 1;
+	cellArray[yCoordinate - 1][xCoordinate][zCoordinate + 1] += 1;
+	cellArray[yCoordinate - 1][xCoordinate + 1][zCoordinate + 1] += 1;
 
 	//	Middle plane
-	field[yCoordinate + 1][xCoordinate - 1][zCoordinate] += 1;
-	field[yCoordinate + 1][xCoordinate][zCoordinate] += 1;
-	field[yCoordinate + 1][xCoordinate + 1][zCoordinate] += 1;
+	cellArray[yCoordinate + 1][xCoordinate - 1][zCoordinate] += 1;
+	cellArray[yCoordinate + 1][xCoordinate][zCoordinate] += 1;
+	cellArray[yCoordinate + 1][xCoordinate + 1][zCoordinate] += 1;
 
-	field[yCoordinate][xCoordinate - 1][zCoordinate] += 1;
-	field[yCoordinate][xCoordinate][zCoordinate] += 1;	
-	field[yCoordinate][xCoordinate + 1][zCoordinate] += 1;
+	cellArray[yCoordinate][xCoordinate - 1][zCoordinate] += 1;
+	cellArray[yCoordinate][xCoordinate][zCoordinate] += 1;	
+	cellArray[yCoordinate][xCoordinate + 1][zCoordinate] += 1;
 
-	field[yCoordinate - 1][xCoordinate - 1][zCoordinate] += 1;
-	field[yCoordinate - 1][xCoordinate][zCoordinate] += 1;
-	field[yCoordinate - 1][xCoordinate + 1][zCoordinate] += 1;
+	cellArray[yCoordinate - 1][xCoordinate - 1][zCoordinate] += 1;
+	cellArray[yCoordinate - 1][xCoordinate][zCoordinate] += 1;
+	cellArray[yCoordinate - 1][xCoordinate + 1][zCoordinate] += 1;
 
 	//	Bottom plane
-	field[yCoordinate + 1][xCoordinate - 1][zCoordinate - 1] += 1;
-	field[yCoordinate + 1][xCoordinate][zCoordinate - 1] += 1;
-	field[yCoordinate + 1][xCoordinate + 1][zCoordinate - 1] += 1;
+	cellArray[yCoordinate + 1][xCoordinate - 1][zCoordinate - 1] += 1;
+	cellArray[yCoordinate + 1][xCoordinate][zCoordinate - 1] += 1;
+	cellArray[yCoordinate + 1][xCoordinate + 1][zCoordinate - 1] += 1;
 
-	field[yCoordinate][xCoordinate - 1][zCoordinate - 1] += 1;
-	field[yCoordinate][xCoordinate][zCoordinate - 1] += 1;
-	field[yCoordinate][xCoordinate + 1][zCoordinate - 1] += 1;
+	cellArray[yCoordinate][xCoordinate - 1][zCoordinate - 1] += 1;
+	cellArray[yCoordinate][xCoordinate][zCoordinate - 1] += 1;
+	cellArray[yCoordinate][xCoordinate + 1][zCoordinate - 1] += 1;
 
-	field[yCoordinate - 1][xCoordinate - 1][zCoordinate - 1] += 1;
-	field[yCoordinate - 1][xCoordinate][zCoordinate - 1] += 1;
-	field[yCoordinate - 1][xCoordinate + 1][zCoordinate - 1] += 1;
+	cellArray[yCoordinate - 1][xCoordinate - 1][zCoordinate - 1] += 1;
+	cellArray[yCoordinate - 1][xCoordinate][zCoordinate - 1] += 1;
+	cellArray[yCoordinate - 1][xCoordinate + 1][zCoordinate - 1] += 1;
 }
 
-inline void Field::RemoveParticle(int yCoordinate, int xCoordinate, int zCoordinate)
+inline void Universe::RemoveParticle(int yCoordinate, int xCoordinate, int zCoordinate)
 {
 	//	Top plane
-	field[yCoordinate + 1][xCoordinate - 1][zCoordinate + 1] -= 1;
-	field[yCoordinate + 1][xCoordinate][zCoordinate + 1] -= 1;
-	field[yCoordinate + 1][xCoordinate + 1][zCoordinate + 1] -= 1;
+	cellArray[yCoordinate + 1][xCoordinate - 1][zCoordinate + 1] -= 1;
+	cellArray[yCoordinate + 1][xCoordinate][zCoordinate + 1] -= 1;
+	cellArray[yCoordinate + 1][xCoordinate + 1][zCoordinate + 1] -= 1;
 
-	field[yCoordinate][xCoordinate - 1][zCoordinate + 1] -= 1;
-	field[yCoordinate][xCoordinate][zCoordinate + 1] -= 1;
-	field[yCoordinate][xCoordinate + 1][zCoordinate + 1] -= 1;
+	cellArray[yCoordinate][xCoordinate - 1][zCoordinate + 1] -= 1;
+	cellArray[yCoordinate][xCoordinate][zCoordinate + 1] -= 1;
+	cellArray[yCoordinate][xCoordinate + 1][zCoordinate + 1] -= 1;
 
-	field[yCoordinate - 1][xCoordinate - 1][zCoordinate + 1] -= 1;
-	field[yCoordinate - 1][xCoordinate][zCoordinate + 1] -= 1;
-	field[yCoordinate - 1][xCoordinate + 1][zCoordinate + 1] -= 1;
+	cellArray[yCoordinate - 1][xCoordinate - 1][zCoordinate + 1] -= 1;
+	cellArray[yCoordinate - 1][xCoordinate][zCoordinate + 1] -= 1;
+	cellArray[yCoordinate - 1][xCoordinate + 1][zCoordinate + 1] -= 1;
 
 	//	Middle plane
-	field[yCoordinate + 1][xCoordinate - 1][zCoordinate] -= 1;
-	field[yCoordinate + 1][xCoordinate][zCoordinate] -= 1;
-	field[yCoordinate + 1][xCoordinate + 1][zCoordinate] -= 1;
+	cellArray[yCoordinate + 1][xCoordinate - 1][zCoordinate] -= 1;
+	cellArray[yCoordinate + 1][xCoordinate][zCoordinate] -= 1;
+	cellArray[yCoordinate + 1][xCoordinate + 1][zCoordinate] -= 1;
 
-	field[yCoordinate][xCoordinate - 1][zCoordinate] -= 1;
-	field[yCoordinate][xCoordinate][zCoordinate] -= 1;
-	field[yCoordinate][xCoordinate + 1][zCoordinate] -= 1;
+	cellArray[yCoordinate][xCoordinate - 1][zCoordinate] -= 1;
+	cellArray[yCoordinate][xCoordinate][zCoordinate] -= 1;
+	cellArray[yCoordinate][xCoordinate + 1][zCoordinate] -= 1;
 
-	field[yCoordinate - 1][xCoordinate - 1][zCoordinate] -= 1;
-	field[yCoordinate - 1][xCoordinate][zCoordinate] -= 1;
-	field[yCoordinate - 1][xCoordinate + 1][zCoordinate] -= 1;
+	cellArray[yCoordinate - 1][xCoordinate - 1][zCoordinate] -= 1;
+	cellArray[yCoordinate - 1][xCoordinate][zCoordinate] -= 1;
+	cellArray[yCoordinate - 1][xCoordinate + 1][zCoordinate] -= 1;
 
 	//	Bottom plane
-	field[yCoordinate + 1][xCoordinate - 1][zCoordinate - 1] -= 1;
-	field[yCoordinate + 1][xCoordinate][zCoordinate - 1] -= 1;
-	field[yCoordinate + 1][xCoordinate + 1][zCoordinate - 1] -= 1;
+	cellArray[yCoordinate + 1][xCoordinate - 1][zCoordinate - 1] -= 1;
+	cellArray[yCoordinate + 1][xCoordinate][zCoordinate - 1] -= 1;
+	cellArray[yCoordinate + 1][xCoordinate + 1][zCoordinate - 1] -= 1;
 
-	field[yCoordinate][xCoordinate - 1][zCoordinate - 1] -= 1;
-	field[yCoordinate][xCoordinate][zCoordinate - 1] -= 1;
-	field[yCoordinate][xCoordinate + 1][zCoordinate - 1] -= 1;
+	cellArray[yCoordinate][xCoordinate - 1][zCoordinate - 1] -= 1;
+	cellArray[yCoordinate][xCoordinate][zCoordinate - 1] -= 1;
+	cellArray[yCoordinate][xCoordinate + 1][zCoordinate - 1] -= 1;
 
-	field[yCoordinate - 1][xCoordinate - 1][zCoordinate - 1] -= 1;
-	field[yCoordinate - 1][xCoordinate][zCoordinate - 1] -= 1;
-	field[yCoordinate - 1][xCoordinate + 1][zCoordinate - 1] -= 1;
+	cellArray[yCoordinate - 1][xCoordinate - 1][zCoordinate - 1] -= 1;
+	cellArray[yCoordinate - 1][xCoordinate][zCoordinate - 1] -= 1;
+	cellArray[yCoordinate - 1][xCoordinate + 1][zCoordinate - 1] -= 1;
 }
 
-inline void Field::UpdateParticlePosition()
+inline void Universe::UpdateParticlePosition()
 {
 	// Stores the difference in inertia between opposing points on the particle
 	int inertiaDiff = 0;
@@ -177,8 +177,8 @@ inline void Field::UpdateParticlePosition()
 		//	o-o-o
 		//	o-o-x
 		inertiaDiff = 
-			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate - 1] - 
-			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate + 1];
+			cellArray[particleList[i].yCoordinate + 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate - 1] - 
+			cellArray[particleList[i].yCoordinate - 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate + 1];
 
 		particleList[i].xInertia += inertiaDiff;
 		particleList[i].yInertia -= inertiaDiff;
@@ -188,8 +188,8 @@ inline void Field::UpdateParticlePosition()
 		//	o-o-o
 		//	o-o-x
 		inertiaDiff =
-			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate + 1] -
-			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate - 1];
+			cellArray[particleList[i].yCoordinate + 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate + 1] -
+			cellArray[particleList[i].yCoordinate - 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate - 1];
 
 		particleList[i].xInertia += inertiaDiff;
 		particleList[i].yInertia -= inertiaDiff;
@@ -199,8 +199,8 @@ inline void Field::UpdateParticlePosition()
 		//	o-o-o
 		//	x-o-o
 		inertiaDiff =
-			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate + 1] -
-			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate - 1];
+			cellArray[particleList[i].yCoordinate - 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate + 1] -
+			cellArray[particleList[i].yCoordinate + 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate - 1];
 
 		particleList[i].xInertia += inertiaDiff;
 		particleList[i].yInertia += inertiaDiff;
@@ -210,8 +210,8 @@ inline void Field::UpdateParticlePosition()
 		//	o-o-o
 		//	x-o-o
 		inertiaDiff =
-			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate - 1] -
-			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate + 1];
+			cellArray[particleList[i].yCoordinate - 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate - 1] -
+			cellArray[particleList[i].yCoordinate + 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate + 1];
 
 		particleList[i].xInertia += inertiaDiff;
 		particleList[i].yInertia += inertiaDiff;
@@ -222,8 +222,8 @@ inline void Field::UpdateParticlePosition()
 		//	x-o-x
 		//	o-o-o
 		inertiaDiff =
-			field[particleList[i].yCoordinate][particleList[i].xCoordinate - 1][particleList[i].zCoordinate - 1] -
-			field[particleList[i].yCoordinate][particleList[i].xCoordinate + 1][particleList[i].zCoordinate + 1];
+			cellArray[particleList[i].yCoordinate][particleList[i].xCoordinate - 1][particleList[i].zCoordinate - 1] -
+			cellArray[particleList[i].yCoordinate][particleList[i].xCoordinate + 1][particleList[i].zCoordinate + 1];
 
 		particleList[i].xInertia += inertiaDiff;
 		particleList[i].zInertia += inertiaDiff;
@@ -232,8 +232,8 @@ inline void Field::UpdateParticlePosition()
 		//	x-o-x
 		//	o-o-o
 		inertiaDiff =
-			field[particleList[i].yCoordinate][particleList[i].xCoordinate - 1][particleList[i].zCoordinate + 1] -
-			field[particleList[i].yCoordinate][particleList[i].xCoordinate + 1][particleList[i].zCoordinate - 1];
+			cellArray[particleList[i].yCoordinate][particleList[i].xCoordinate - 1][particleList[i].zCoordinate + 1] -
+			cellArray[particleList[i].yCoordinate][particleList[i].xCoordinate + 1][particleList[i].zCoordinate - 1];
 
 		particleList[i].xInertia += inertiaDiff;
 		particleList[i].zInertia -= inertiaDiff;
@@ -243,8 +243,8 @@ inline void Field::UpdateParticlePosition()
 		//	o-o-o
 		//	o-x-o
 		inertiaDiff =
-			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate][particleList[i].zCoordinate + 1] -
-			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate][particleList[i].zCoordinate - 1];
+			cellArray[particleList[i].yCoordinate - 1][particleList[i].xCoordinate][particleList[i].zCoordinate + 1] -
+			cellArray[particleList[i].yCoordinate + 1][particleList[i].xCoordinate][particleList[i].zCoordinate - 1];
 
 		particleList[i].yInertia += inertiaDiff;
 		particleList[i].zInertia -= inertiaDiff;
@@ -253,8 +253,8 @@ inline void Field::UpdateParticlePosition()
 		//	o-o-o
 		//	o-x-o
 		inertiaDiff =
-			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate][particleList[i].zCoordinate - 1] -
-			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate][particleList[i].zCoordinate + 1];
+			cellArray[particleList[i].yCoordinate - 1][particleList[i].xCoordinate][particleList[i].zCoordinate - 1] -
+			cellArray[particleList[i].yCoordinate + 1][particleList[i].xCoordinate][particleList[i].zCoordinate + 1];
 
 		particleList[i].yInertia += inertiaDiff;
 		particleList[i].zInertia += inertiaDiff;
@@ -264,8 +264,8 @@ inline void Field::UpdateParticlePosition()
 		//	o-o-o
 		//	o-o-x
 		inertiaDiff =
-			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate] -
-			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate];
+			cellArray[particleList[i].yCoordinate + 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate] -
+			cellArray[particleList[i].yCoordinate - 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate];
 
 		particleList[i].xInertia += inertiaDiff;
 		particleList[i].yInertia -= inertiaDiff;
@@ -274,8 +274,8 @@ inline void Field::UpdateParticlePosition()
 		//	o-o-o
 		//	x-o-o
 		inertiaDiff =
-			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate] -
-			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate];
+			cellArray[particleList[i].yCoordinate - 1][particleList[i].xCoordinate - 1][particleList[i].zCoordinate] -
+			cellArray[particleList[i].yCoordinate + 1][particleList[i].xCoordinate + 1][particleList[i].zCoordinate];
 
 		particleList[i].xInertia += inertiaDiff;
 		particleList[i].yInertia += inertiaDiff;	
@@ -285,24 +285,24 @@ inline void Field::UpdateParticlePosition()
 		//	x-o-x
 		//	o-o-o
 		particleList[i].xInertia +=
-			field[particleList[i].yCoordinate][particleList[i].xCoordinate - 1][particleList[i].zCoordinate] - 
-			field[particleList[i].yCoordinate][particleList[i].xCoordinate + 1][particleList[i].zCoordinate];
+			cellArray[particleList[i].yCoordinate][particleList[i].xCoordinate - 1][particleList[i].zCoordinate] - 
+			cellArray[particleList[i].yCoordinate][particleList[i].xCoordinate + 1][particleList[i].zCoordinate];
 		
 		//	Calculating the center y-inertia
 		//	o-x-o
 		//	o-o-o
 		//	o-x-o
 		particleList[i].yInertia += 
-			field[particleList[i].yCoordinate - 1][particleList[i].xCoordinate][particleList[i].zCoordinate] - 
-			field[particleList[i].yCoordinate + 1][particleList[i].xCoordinate][particleList[i].zCoordinate];
+			cellArray[particleList[i].yCoordinate - 1][particleList[i].xCoordinate][particleList[i].zCoordinate] - 
+			cellArray[particleList[i].yCoordinate + 1][particleList[i].xCoordinate][particleList[i].zCoordinate];
 
 		//	Calculating the center z-inertia
 		//	o-o-o
 		//	o-x-o
 		//	o-o-o
 		particleList[i].zInertia +=
-			field[particleList[i].yCoordinate][particleList[i].xCoordinate][particleList[i].zCoordinate - 1] -
-			field[particleList[i].yCoordinate][particleList[i].xCoordinate][particleList[i].zCoordinate + 1];
+			cellArray[particleList[i].yCoordinate][particleList[i].xCoordinate][particleList[i].zCoordinate - 1] -
+			cellArray[particleList[i].yCoordinate][particleList[i].xCoordinate][particleList[i].zCoordinate + 1];
 
 		//	Clamp the inertia between -9 and 9
 		//	(9 & ((x < 9) - 1)) <- Clamp to 9 units of inertia if x is more than 9
@@ -366,23 +366,23 @@ inline void Field::UpdateParticlePosition()
 }
 
 //	Convert from index to coordinate
-inline float Field::xFieldIndexToCoordinate(int particleListNumber)
+inline float Universe::xFieldIndexToCoordinate(int particleListNumber)
 {
 	return (particleList[particleListNumber].xCoordinate - ((float)DEFAULT_DIMENSION / 2.0f)) * 0.01f;
 }
 
-inline float Field::yFieldIndexToCoordinate(int particleListNumber)
+inline float Universe::yFieldIndexToCoordinate(int particleListNumber)
 {
 	return (particleList[particleListNumber].yCoordinate - ((float)DEFAULT_DIMENSION / 2.0f)) * 0.01f;
 }
 
-inline float Field::zFieldIndexToCoordinate(int particleListNumber)
+inline float Universe::zFieldIndexToCoordinate(int particleListNumber)
 {
 	return (particleList[particleListNumber].zCoordinate - ((float)DEFAULT_DIMENSION / 2.0f)) * 0.01f;
 }
 
 //	Convert from coordinate to index
-inline int Field::coordinateToFieldIndex(int coordinate)
+inline int Universe::coordinateToFieldIndex(int coordinate)
 {
 	return coordinate + (DEFAULT_DIMENSION / 2);
 }

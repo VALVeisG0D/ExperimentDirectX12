@@ -73,11 +73,11 @@
     <ClInclude Include="App.h" />
     <ClInclude Include="ExperimentDirectX12Main.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="Field.h">
-      <Filter>Content</Filter>
-    </ClInclude>
     <ClInclude Include="MoveLookController.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Universe.h">
+      <Filter>Content</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest" />

@@ -34,7 +34,7 @@
 
 #include "pch.h"
 #include "Sample3DSceneRenderer.h"
-#include "Field.h"
+#include "Universe.h"
 
 #include "..\Common\DirectXHelper.h"
 #include <ppltasks.h>
@@ -50,7 +50,7 @@ using namespace Windows::Storage;
 
 constexpr int PARTICLE_COUNT = 33;
 
-Field field(PARTICLE_COUNT);
+Universe field(PARTICLE_COUNT);
 
 // Loads vertex and pixel shaders from files and instantiates the cube geometry.
 Sample3DSceneRenderer::Sample3DSceneRenderer(const std::shared_ptr<DX::DeviceResources>& deviceResources) :
